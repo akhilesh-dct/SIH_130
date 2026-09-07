@@ -15,7 +15,7 @@ This is a multi-module application being built incrementally:
 |------|--------|--------|
 | Task 1 | Authentication (Login Page) | ✅ Implemented |
 | Task 2 | Document Verification | ✅ Implemented |
-| Task 3 | Business Dashboard | 🔲 Planned |
+| Task 3 | Business Dashboard | ✅ Implemented |
 
 ---
 
@@ -241,6 +241,22 @@ To reset upload state: refresh the page (in-memory mock only).
 3. Map to endpoints: `GET /api/v1/documents`, `POST /api/v1/documents/:id/upload`, etc.
 
 **Zero UI or store changes needed.**
+
+## Currently Implemented Features (Task 3)
+
+### Dashboard & Layout
+- **App Layout**: Persistent sidebar navigation on desktop, mobile slide-out drawer, top bar.
+- **Metric Row**: High-level KPIs (Applications, Actions, Documents, Approvals).
+- **Action Required Alerts**: Urgency-colored actionable alerts that link directly to resolutions.
+- **Application Status & Feed**: List view of ongoing applications with progress bars and status indicators.
+- **Application Detail View**: Deep dive into individual applications, showing complete timelines, reference numbers, and SLA tracking.
+- **Recent Activity**: Date-grouped activity stream.
+- **Document Widget**: Integration of Task 2 into the dashboard overview.
+
+### Connecting Dashboard Service to FastAPI
+1. Open [`src/services/dashboard.service.ts`](src/services/dashboard.service.ts)
+2. Replace the `DashboardService` class body with real `fetch` calls.
+3. Replace the mock endpoints with `GET /api/v1/dashboard/stats`, `GET /api/v1/applications`, etc.
 
 ---
 

@@ -1,7 +1,7 @@
 # PRD — IndustriaConnect: Industrial Approvals & Compliance Platform
 
 **Document version:** 2.0  
-**Status:** Active — Task 1 (Authentication) + Task 2 (Document Verification) Implemented  
+**Status:** Active — Task 1 (Auth) + Task 2 (Docs) + Task 3 (Dashboard) Implemented  
 **Project:** SIH 2026, Problem Statement 130
 
 ---
@@ -210,8 +210,33 @@ Login → Dashboard → Documents
 - [x] No console errors in production build
 - [x] All existing routes (login, dashboard) continue to work
 
+
 ### Verification Summary
 
 Shows aggregate counts visible at the top of the workspace:
 - Required, Uploaded, Verified, Needs Attention, Pending, Rejected
 
+## Task 3: Business Dashboard
+
+The business dashboard serves as the central workspace for the authenticated user, summarizing all ongoing and completed activities within IndustriaConnect.
+
+### Core Objectives
+1. **At-a-Glance Clarity**: Instantly show application statuses and compliance metrics.
+2. **Action-Oriented Design**: Highlight pending items that block progress.
+3. **Comprehensive Tracking**: Let users see where applications are stuck in the bureaucracy.
+4. **Navigational Shell**: Implement the primary app layout (sidebar + header) for all views.
+
+### Modules & Widgets
+- **Global Navigation (AppLayout)**: Responsive sidebar for desktop, drawer for mobile. Notification bell with unread count.
+- **Metric Row (KPIs)**: High-level counts for total applications, required actions, document statuses, and approvals.
+- **Action Required**: High-priority alerts requiring user intervention (e.g., query raised by officer, missing documents).
+- **Application Status Feed**: Sortable list of ongoing applications showing current stage, department, and progress bar.
+- **Document Status Widget**: Summarized view of required vs. verified documents with quick links to the Document Verification module.
+- **Approval Progress Widget**: Shows completion percentage of multi-step approvals.
+- **Recent Activity Feed**: Chronological log of system and user events.
+- **Application Detail View (`/applications/:id`)**: Deep-dive page showing full timeline of a specific application and metadata (department, reference number, SLA deadline).
+
+### UX/UI Philosophy
+- **Restraint & Utility**: Focus on fast information retrieval, avoiding decorative clutter.
+- **Severity-based Coloring**: Use standard semantic colors for urgency (red = urgent, amber = warning, green = success).
+- **Smooth Navigation**: Zero page reloads across the dashboard, documents, and application details.

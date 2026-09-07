@@ -1,7 +1,7 @@
 # TRD — IndustriaConnect: Technical Reference Document
 
 **Document version:** 2.0  
-**Status:** Task 1 (Authentication) + Task 2 (Document Verification) Implemented  
+**Status:** Task 1 + 2 + 3 Implemented  
 **Project:** SIH 2026, Problem Statement 130
 
 ---
@@ -361,9 +361,38 @@ The in-memory mock resets on page reload. When connecting to FastAPI, the mock d
 
 ### AppLayout — Task 3 Integration Point
 
-`AppLayout` is the shared shell for all authenticated pages. Task 3 will extend it:
-- Add a collapsible sidebar navigation
-- Add notification bell
-- Add organization switcher
+`AppLayout` is the shared shell for all authenticated pages. Task 3 extended it to include:
+- A collapsible sidebar navigation structure
+- A mobile drawer layout
+- A notification bell in the topbar with an unread badge and dropdown panel
 
-Existing pages (Documents, Dashboard) will automatically inherit Task 3's nav changes.
+Existing pages (Documents, Dashboard, Applications) automatically inherit this layout.
+
+## 5. Task 3: Dashboard Architecture
+
+### Store Architecture (Zustand)
+The dashboard uses a dedicated `dashboardStore` to manage all its state. Unlike the document store, this data is heavily aggregated and primarily fetch-driven.
+- State: `stats`, `applications`, `actions`, `approvals`, `activity`, `notifications`.
+- Computed: `unreadCount`.
+- Methods: parallel data fetching via `Promise.all` in `fetchAll()`.
+
+### Services
+`dashboard.service.ts` provides the `IDashboardService` interface, mocking future FastAPI endpoints like `/api/v1/dashboard/stats`, `/api/v1/applications`, and `/api/v1/notifications`.
+
+### Component Design
+The dashboard employs a highly modular widget architecture:
+- `MetricCard.tsx`: Reusable KPI tile.
+- `ApplicationStatusCard.tsx`: Row component for application listings.
+- `ActionRequiredCard.tsx`: Alert tile for actionable items.
+- `DocumentStatusWidget.tsx`: Directly integrates Task 2's knowledge domain into the dashboard.
+- `ApprovalProgress.tsx`: Status tracking.
+- `RecentActivity.tsx`: Chronological feed grouped by day.
+- `ApplicationTimeline.tsx`: Specialized vertical stepper for detail views.
+
+### Routing Additions
+Task 3 implemented multiple routes, maintaining SPA integrity:
+- `/dashboard`
+- `/applications` (List view)
+- `/applications/:applicationId` (Detail view)
+
+Placeholders are used for unbuilt sections (`/approvals`, `/compliance`) which also render within the `AppLayout`.
