@@ -1,20 +1,20 @@
 /**
  * Router Configuration
  *
- * All application routes are declared here. Adding new modules (Task 2, Task 3)
- * requires only adding entries here — no restructuring of App.tsx.
+ * All application routes are declared here. Adding new modules requires
+ * only adding entries here — no restructuring of App.tsx.
  *
  * Route structure:
  *   /                   → redirect to /login
  *   /login              → LoginPage
- *   /register           → RegisterPage (Task 2)
- *   /forgot-password    → ForgotPasswordPage (Task 2)
+ *   /register           → RegisterPage (future)
+ *   /forgot-password    → ForgotPasswordPage (future)
  *   /dashboard          → DashboardPage (Task 3) — protected
  *   /documents          → DocumentsPage (Task 2) — protected
+ *   /documents/:id      → DocumentsPage (with pre-selected document) — protected
  *   /applications       → ApplicationsPage — protected
  *   /profile            → ProfilePage — protected
  */
-
 
 import {
   createBrowserRouter,
@@ -25,6 +25,7 @@ import {
 import { useAuthStore } from '@/store/authStore';
 import { LoginPage } from '@/pages/LoginPage';
 import { DashboardPage } from '@/pages/DashboardPage';
+import { DocumentsPage } from '@/pages/DocumentsPage';
 
 // ---------------------------------------------------------------------------
 // Protected Route Guard
@@ -94,9 +95,14 @@ const router = createBrowserRouter([
         path: '/dashboard',
         element: <DashboardPage />,
       },
+      // Document verification — Task 2
       {
         path: '/documents',
-        element: <PlaceholderPage title="Document Verification — Task 2" />,
+        element: <DocumentsPage />,
+      },
+      {
+        path: '/documents/:documentId',
+        element: <DocumentsPage />,
       },
       {
         path: '/applications',

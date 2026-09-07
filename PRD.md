@@ -1,7 +1,7 @@
 # PRD — IndustriaConnect: Industrial Approvals & Compliance Platform
 
-**Document version:** 1.0  
-**Status:** Active — Task 1 (Authentication) Implemented  
+**Document version:** 2.0  
+**Status:** Active — Task 1 (Authentication) + Task 2 (Document Verification) Implemented  
 **Project:** SIH 2026, Problem Statement 130
 
 ---
@@ -128,11 +128,90 @@ Loading state (button spinner, form disabled, ~900ms)
 
 ## 9. Future Integration Points
 
+
 | Module | Notes |
 |--------|-------|
-| Task 2 — Document Verification | Will use the same `AuthLayout`, `FormField`, and auth store established here |
+| Task 2 — Document Verification | ✅ Implemented — see Section 10 below |
 | Task 3 — Dashboard | The `DashboardPage` placeholder and route exist; Task 3 fills the content |
 | Backend (FastAPI) | `auth.service.ts` interface is stable; swap mock implementation for real HTTP calls |
 | SSO / OAuth | Router and auth hook are designed to accept additional auth methods |
 | OTP / MFA | Password step can be extended with a multi-step form flow |
 | Session refresh | `validateSession()` in auth service is scaffolded for token refresh |
+
+---
+
+## 10. Document Verification Feature (Task 2)
+
+### Feature Objective
+
+Provide a professional document management workspace where business users can:
+- View all required and optional compliance documents for their application
+- Upload documents in accepted formats
+- Track verification status for each document
+- Review verification check results and identified issues
+- Take corrective action on documents requiring attention
+
+### Documents in Scope
+
+| Document | Category | Required |
+|----------|----------|---------|
+| Certificate of Incorporation | Corporate | Yes |
+| PAN Card (Organization) | Tax | Yes |
+| GST Registration Certificate | Tax | Yes |
+| Factory License | Factory | Yes |
+| Environmental Consent Order | Environment | Yes |
+| Address Proof (Registered Office) | Identity | Yes |
+| Project Report / DPR | Financial | No |
+
+### User Journey
+
+```
+Login → Dashboard → Documents
+  → Select document from list
+  → Upload file (drag/drop or browse)
+  → File uploaded → queued for verification
+  → Verification result: Verified / Needs Attention / Rejected
+  → If Needs Attention: review issue → replace document
+  → All required documents verified → Continue to Application
+```
+
+### Document Statuses
+
+| Status | Description |
+|--------|-------------|
+| Not Uploaded | No file submitted |
+| Uploaded | File submitted, verification pending |
+| Verifying | Under active review |
+| Verified | All checks passed |
+| Needs Attention | Issue identified — user action required |
+| Rejected | Document rejected — must re-submit |
+
+### Verification Checks (per document)
+
+1. Document format — file type and structure
+2. Required fields — all mandatory fields present
+3. Document legibility — content readable
+4. Information consistency — matches application data
+5. Validity period — within valid date range
+
+### Acceptance Criteria — Task 2
+
+- [x] Document list shows all required and optional documents grouped
+- [x] Each document shows name, category, status badge, upload date
+- [x] Clicking a document selects it and shows preview + details
+- [x] Upload zone supports click-to-browse and drag-and-drop
+- [x] Upload progress shown with animated bar
+- [x] Verified documents show green status and checklist of passed checks
+- [x] Needs Attention documents show issue card with description and suggested action
+- [x] Replace file option available for needs-attention/rejected documents
+- [x] Verification summary bar shows aggregate counts
+- [x] Responsive: mobile tab navigation, tablet two-panel, desktop three-panel
+- [x] Continue to Application button links to application workflow
+- [x] No console errors in production build
+- [x] All existing routes (login, dashboard) continue to work
+
+### Verification Summary
+
+Shows aggregate counts visible at the top of the workspace:
+- Required, Uploaded, Verified, Needs Attention, Pending, Rejected
+

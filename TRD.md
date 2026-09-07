@@ -1,7 +1,7 @@
 # TRD — IndustriaConnect: Technical Reference Document
 
-**Document version:** 1.0  
-**Status:** Task 1 (Authentication) Implemented  
+**Document version:** 2.0  
+**Status:** Task 1 (Authentication) + Task 2 (Document Verification) Implemented  
 **Project:** SIH 2026, Problem Statement 130
 
 ---
@@ -258,3 +258,112 @@ src/
 ├── main.tsx
 └── index.css                    # Tailwind v4 @theme design tokens
 ```
+
+---
+
+## 12. Document Verification Module — Task 2
+
+### Module Overview
+
+The Document Verification module is a client-side workspace for document management and verification status display. It has no real backend — the mock service simulates the full flow.
+
+### Component Architecture
+
+```
+pages/DocumentsPage.tsx              ← Three-panel workspace orchestrator
+  └── components/layout/AppLayout.tsx  ← Shared nav shell (used by all auth pages)
+  └── components/documents/
+      ├── DocumentList.tsx            ← Scrollable list of document slots
+      ├── DocumentCard.tsx            ← Individual row with status + file info
+      ├── DocumentPreview.tsx         ← Center panel — mock document representation
+      ├── DocumentDetails.tsx         ← Right panel — upload + verification result
+      ├── DocumentUpload.tsx          ← Upload state machine component
+      ├── UploadProgress.tsx          ← Animated progress bar during upload
+      ├── VerificationStatus.tsx      ← Status badge (shared)
+      ├── VerificationChecklist.tsx   ← List of check results
+      ├── VerificationIssue.tsx       ← Issue card for attention/rejected
+      └── VerificationSummary.tsx     ← Aggregate counts header bar
+```
+
+### Data Layer
+
+```
+src/
+├── types/document.types.ts    ← All TypeScript types for the domain
+├── data/documents.ts          ← Mock data (replace with API fetch)
+├── services/document.service.ts ← IDocumentService interface + mock impl
+└── store/documentStore.ts     ← Zustand store (no persistence)
+```
+
+### TypeScript Types
+
+```typescript
+Document           // Core document entity
+UploadedFile       // File metadata after upload
+VerificationResult // Result of a verification run
+VerificationCheck  // Individual check item
+VerificationIssue  // Identified issue with suggested action
+VerificationSummary // Aggregate counts
+DocumentUploadRequest / Response // API shapes
+UploadState        // Discriminated union for upload UI state machine
+```
+
+### Service Interface (FastAPI Integration Boundary)
+
+```typescript
+interface IDocumentService {
+  getDocuments(): Promise<Document[]>;
+  getDocument(id: string): Promise<Document | null>;
+  uploadFile(documentId, file, onProgress): Promise<DocumentUploadResponse>;
+  removeFile(documentId: string): Promise<void>;
+  getSummary(): Promise<VerificationSummary>;
+}
+```
+
+**FastAPI endpoint mapping:**
+
+| Method | Endpoint | Maps to |
+|--------|----------|---------|
+| GET | `/api/v1/documents` | `getDocuments()` |
+| GET | `/api/v1/documents/:id` | `getDocument(id)` |
+| POST | `/api/v1/documents/:id/upload` | `uploadFile()` |
+| DELETE | `/api/v1/documents/:id/file` | `removeFile()` |
+| GET | `/api/v1/documents/summary` | `getSummary()` |
+
+### Upload State Machine
+
+The `UploadState` type is a discriminated union:
+
+```
+idle → selected → uploading → success
+                            → error → idle (on retry)
+```
+
+This drives all visual states in `DocumentUpload.tsx` without any conditional boolean flags.
+
+### Routing
+
+```
+/documents                → DocumentsPage (list view, first doc auto-selected)
+/documents/:documentId    → DocumentsPage (specific doc pre-selected — for future deep links)
+```
+
+### Layout Breakpoints
+
+| Breakpoint | Layout |
+|-----------|--------|
+| < 1024px (xl) | Mobile: tab navigation between List / Preview / Details panels |
+| ≥ 1024px (xl) | Desktop: full three-panel side-by-side layout |
+
+### Mock Data Reset
+
+The in-memory mock resets on page reload. When connecting to FastAPI, the mock data module (`src/data/documents.ts`) and mock service (`src/services/document.service.ts`) are the only files that need replacing.
+
+### AppLayout — Task 3 Integration Point
+
+`AppLayout` is the shared shell for all authenticated pages. Task 3 will extend it:
+- Add a collapsible sidebar navigation
+- Add notification bell
+- Add organization switcher
+
+Existing pages (Documents, Dashboard) will automatically inherit Task 3's nav changes.
