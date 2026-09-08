@@ -9,7 +9,8 @@
  */
 
 import { useEffect } from 'react';
-import { FolderOpen, FileText, CheckSquare, AlertCircle } from 'lucide-react';
+import { Link } from 'react-router-dom';
+import { FolderOpen, FileText, CheckSquare, AlertCircle, Building2} from 'lucide-react';
 import { useAuthStore } from '@/store/authStore';
 import { useDashboardStore } from '@/store/dashboardStore';
 import { AppLayout } from '@/components/layout/AppLayout';
@@ -72,15 +73,28 @@ export function DashboardPage() {
   return (
     <AppLayout>
       {/* ── Greeting header ── */}
-      <div className="mb-6">
-        <h1 className="text-xl font-semibold text-slate-900 tracking-tight">
-          {greeting()}{firstName ? `, ${firstName}` : ''}
-        </h1>
-        <p className="mt-1 text-sm text-slate-500">
-          {user?.organizationName} &nbsp;·&nbsp;
-          Here's the current status of your applications and compliance requirements.
-        </p>
-      </div>
+    {/* ── Greeting header ── */}
+<div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+  <div>
+    <h1 className="text-xl font-semibold text-slate-900 tracking-tight">
+      {greeting()}{firstName ? `, ${firstName}` : ''}
+    </h1>
+
+    <p className="mt-1 text-sm text-slate-500">
+      {user?.organizationName} &nbsp;·&nbsp;
+      Here's the current status of your applications and compliance requirements.
+    </p>
+  </div>
+
+  <Link
+    to="/applications/new"
+    className="inline-flex shrink-0 items-center justify-center gap-2 rounded-lg bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-blue-700"
+  >
+    <Building2 size={17} />
+    Create New Business
+  </Link>
+</div>
+
 
       {/* ── Error state ── */}
       {error && (

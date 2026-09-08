@@ -5,7 +5,7 @@
  * Route: /applications
  */
 
-import { useEffect } from 'react';
+import { useEffect ,useState} from 'react';
 
 import { FolderOpen } from 'lucide-react';
 import { useDashboardStore } from '@/store/dashboardStore';
@@ -15,14 +15,33 @@ import { ApplicationStatusCard } from '@/components/dashboard/ApplicationStatusC
 export function ApplicationsPage() {
   const { applications, isLoading, fetchAll } = useDashboardStore();
 
+
+
+
+  const [newApplications, setNewApplications] = useState<any[]>([]);
+useEffect(() => {
+  const saved = JSON.parse(
+    localStorage.getItem('sih_business_applications') || '[]',
+  );
+  setNewApplications(saved);
+}, []);
+
+
   useEffect(() => {
     if (applications.length === 0) fetchAll();
   }, [applications.length, fetchAll]);
 
-  const active = applications.filter(
+
+  const allApplications = [
+  ...newApplications,
+  ...applications,
+];
+
+
+  const active = allApplications.filter(
     (a) => a.status !== 'approved' && a.status !== 'rejected' && a.status !== 'withdrawn'
   );
-  const completed = applications.filter(
+  const completed = allApplications.filter(
     (a) => a.status === 'approved' || a.status === 'rejected' || a.status === 'withdrawn'
   );
 
@@ -41,7 +60,7 @@ export function ApplicationsPage() {
             <div key={i} className="h-28 rounded-lg border border-slate-200 bg-white" />
           ))}
         </div>
-      ) : applications.length === 0 ? (
+      ) : allApplications.length === 0 ? (
         <div className="flex flex-col items-center justify-center py-24 text-center">
           <div className="flex size-12 items-center justify-center rounded-full bg-slate-100 mb-4">
             <FolderOpen className="size-6 text-slate-400" aria-hidden="true" />

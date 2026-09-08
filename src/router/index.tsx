@@ -18,13 +18,16 @@
  *   /schemes                 → placeholder (protected)
  *   /profile                 → placeholder (protected)
  */
-
 import {
   createBrowserRouter,
   RouterProvider,
   Navigate,
   Outlet,
 } from 'react-router-dom';
+
+import { LandingPage } from '@/pages/LandingPage';
+import { BusinessApplicationPage } from '@/pages/BusinessApplicationPage';
+import { BusinessDetailsPage } from '@/components/BusinessDetailsPage';
 import { useAuthStore } from '@/store/authStore';
 import { LoginPage } from '@/pages/LoginPage';
 import { DashboardPage } from '@/pages/DashboardPage';
@@ -103,7 +106,7 @@ const router = createBrowserRouter([
   // Root redirect
   {
     path: '/',
-    element: <Navigate to="/login" replace />,
+    element: <LandingPage />,
   },
 
   // Public routes
@@ -129,15 +132,26 @@ const router = createBrowserRouter([
         path: '/dashboard',
         element: <DashboardPage />,
       },
+
+       {
+         path: '/business',
+        element: <BusinessDetailsPage />,
+      },
+
       // Task 3 — Applications
       {
         path: '/applications',
         element: <ApplicationsPage />,
       },
       {
+        path: '/applications/new',
+        element: <BusinessApplicationPage />,
+      },
+      {
         path: '/applications/:applicationId',
         element: <ApplicationDetailPage />,
       },
+
       // Task 2 — Document verification
       {
         path: '/documents',

@@ -11,6 +11,7 @@ import { type ReactNode, useState, useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import {
   Layers,
+  Building2,
   LogOut,
   User,
   FileText,
@@ -60,6 +61,11 @@ const PRIMARY_NAV: NavItem[] = [
   { href: '/documents', label: 'Documents', Icon: FileText },
   { href: '/approvals', label: 'Approvals', Icon: CheckSquare, disabled: true },
   { href: '/compliance', label: 'Compliance', Icon: CheckSquare, disabled: true },
+  {
+  href: '/business',
+  label: 'Business Details',
+  Icon: Building2,
+},
 ];
 
 const SECONDARY_NAV: NavItem[] = [
