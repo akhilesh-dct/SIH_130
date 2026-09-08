@@ -19,6 +19,7 @@ import { ApplicationStatusCard } from '@/components/dashboard/ApplicationStatusC
 import { ActionRequiredCard } from '@/components/dashboard/ActionRequiredCard';
 import { DocumentStatusWidget } from '@/components/dashboard/DocumentStatusWidget';
 import { RecentActivity } from '@/components/dashboard/RecentActivity';
+import { RecommendedSchemesWidget } from '@/components/dashboard/RecommendedSchemesWidget';
 import { useApprovalStore } from '@/store/approvalStore';
 import { cn } from '@/lib/utils';
 
@@ -244,6 +245,7 @@ export function DashboardPage() {
               </ul>
             </div>
           )}
+          <RecommendedSchemesWidget />
         </div>
       </div>
     </AppLayout>

@@ -44,6 +44,10 @@ import { Escalations } from '@/pages/Escalations';
 import { AuditLogs } from '@/pages/AuditLogs';
 import { ApprovalsPage } from '@/pages/ApprovalsPage';
 import { ApprovalDetailsPage } from '@/pages/ApprovalDetailsPage';
+import { SchemesPage } from '@/pages/SchemesPage';
+import { SchemeDetailPage } from '@/pages/SchemeDetailPage';
+import { SchemeEligibilityPage } from '@/pages/SchemeEligibilityPage';
+import { SavedSchemesPage } from '@/pages/SavedSchemesPage';
 
 // ---------------------------------------------------------------------------
 // Protected Route Guards
@@ -197,12 +201,19 @@ const router = createBrowserRouter([
       },
       {
         path: '/schemes',
-        element: (
-          <PlaceholderPage
-            title="Schemes & Support"
-            description="Explore central and state government support schemes."
-          />
-        ),
+        element: <SchemesPage />,
+      },
+      {
+        path: '/schemes/saved',
+        element: <SavedSchemesPage />,
+      },
+      {
+        path: '/schemes/:id',
+        element: <SchemeDetailPage />,
+      },
+      {
+        path: '/schemes/:id/eligibility',
+        element: <SchemeEligibilityPage />,
       },
       {
         path: '/profile',

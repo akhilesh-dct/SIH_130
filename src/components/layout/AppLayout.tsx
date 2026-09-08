@@ -69,7 +69,7 @@ const PRIMARY_NAV: NavItem[] = [
 ];
 
 const SECONDARY_NAV: NavItem[] = [
-  { href: '/schemes', label: 'Schemes & Support', Icon: LifeBuoy, disabled: true },
+  { href: '/schemes', label: 'Schemes & Support', Icon: LifeBuoy },
   { href: '/profile', label: 'Profile', Icon: User },
 ];
 
