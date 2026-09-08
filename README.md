@@ -17,6 +17,7 @@ This is a multi-module application being built incrementally:
 | Task 2 | Document Verification | ✅ Implemented |
 | Task 3 | Business Dashboard | ✅ Implemented |
 | Task 4 | Government Operations Module | ✅ Implemented |
+| Task 6 | Approval Module | ✅ Implemented |
 
 ---
 
@@ -249,8 +250,9 @@ To reset upload state: refresh the page (in-memory mock only).
 ### Dashboard & Layout
 - **App Layout**: Persistent sidebar navigation on desktop, mobile slide-out drawer, top bar.
 - **Metric Row**: High-level KPIs (Applications, Actions, Documents, Approvals).
-- **Action Required Alerts**: Urgency-colored actionable alerts that link directly to resolutions.
-- **Application Status & Feed**: List view of ongoing applications with progress bars and status indicators.
+- **Document Vault (`/documents`)**: Upload and track document verification status. Includes an upload state machine and verification checklist.
+- **Approvals (`/approvals`)**: Manage required approvals, view regulatory catalogs, check document readiness deterministically, track timeline progress, and handle expiring renewals.
+- **Government Module (`/government/*`)**: Dedicated workspace for government officials to process applications, track SLA deadlines, and handle escalations. Accessible only to `officer` or `admin` roles.
 - **Application Detail View**: Deep dive into individual applications, showing complete timelines, reference numbers, and SLA tracking.
 - **Recent Activity**: Date-grouped activity stream.
 - **Document Widget**: Integration of Task 2 into the dashboard overview.

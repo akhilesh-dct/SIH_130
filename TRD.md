@@ -423,3 +423,21 @@ The service layer drives all decision-making without relying on AI:
 
 ### Component Design (Action Dialogs)
 Instead of fragmented pages, administrative actions are designed as context-aware, inline modal dialogs (`AssignOfficerDialog.tsx`, `EscalationDialog.tsx`) directly accessible from the application details view. This reduces context switching for government officers.
+
+---
+
+## 7. Task 6: Approval Module
+
+### Architecture Overview
+The Approval Module provides the "Compliance and Lifecycle Workspace" for the business user. It operates on a composite data pattern that merges static regulatory requirements (the Catalog) with the dynamic state of a business's compliance journey (the Application).
+
+### Data Layer (`approval.service.ts` & `approvalStore.ts`)
+- **`approvalStore`**: Orchestrates data fetching via `approvalService`. It maintains a list of composite `ApprovalDetail` objects containing both `catalog` and `application` data.
+- **Document Store Integration**: The Approval Module tightly integrates with the `documentStore` (via the `DocumentReadiness.tsx` component) to cross-reference verified documents against the required documents specified in the Approval Catalog. This yields a deterministic readiness check.
+
+### Core Components
+- `ApprovalsPage.tsx`: Aggregates the list of required approvals with high-level metrics (Required, In Progress, Approved, Expiring).
+- `ApprovalDetailsPage.tsx`: The primary interface for understanding an approval's prerequisites, tracking its lifecycle timeline, seeing document readiness, and initiating required actions (e.g., resolving queries, starting a renewal).
+- `ApprovalCard.tsx`: A reusable card summarizing the approval's status, SLA, and requirements.
+- `DocumentReadiness.tsx`: Calculates readiness and visually displays which required documents are verified, missing, or need attention.
+- `ApprovalTimeline.tsx`: A vertical timeline component tracking the application through its stages.

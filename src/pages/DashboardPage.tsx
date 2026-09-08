@@ -18,8 +18,9 @@ import { MetricCard } from '@/components/dashboard/MetricCard';
 import { ApplicationStatusCard } from '@/components/dashboard/ApplicationStatusCard';
 import { ActionRequiredCard } from '@/components/dashboard/ActionRequiredCard';
 import { DocumentStatusWidget } from '@/components/dashboard/DocumentStatusWidget';
-import { ApprovalProgress } from '@/components/dashboard/ApprovalProgress';
 import { RecentActivity } from '@/components/dashboard/RecentActivity';
+import { useApprovalStore } from '@/store/approvalStore';
+import { cn } from '@/lib/utils';
 
 // ---------------------------------------------------------------------------
 // Greeting helper
@@ -53,13 +54,16 @@ function MetricSkeleton() {
 export function DashboardPage() {
   const { user } = useAuthStore();
   const {
-    stats, applications, actions, approvals, activity,
+    stats, applications, actions, activity,
     isLoading, error, fetchAll,
   } = useDashboardStore();
 
+  const { approvals, fetchAll: fetchAllApprovals, isLoading: isApprovalsLoading } = useApprovalStore();
+
   useEffect(() => {
     fetchAll();
-  }, [fetchAll]);
+    fetchAllApprovals();
+  }, [fetchAll, fetchAllApprovals]);
 
   const firstName = user?.name?.split(' ')[0] ?? '';
 
@@ -130,19 +134,31 @@ export function DashboardPage() {
             Icon={AlertCircle}
             intent={stats.applications.actionRequired > 0 ? 'warning' : 'default'}
           />
-          <MetricCard
-            label="Documents verified"
-            value={`${stats.documents.verified}/${stats.documents.required}`}
-            subLabel={stats.documents.needsAttention > 0 ? `${stats.documents.needsAttention} need attention` : 'All checked'}
-            Icon={FileText}
-            intent={stats.documents.needsAttention > 0 ? 'warning' : 'success'}
-          />
-          <MetricCard
-            label="Approvals completed"
-            value={`${stats.approvals.completed}/${stats.approvals.required}`}
-            subLabel={`${stats.approvals.pending} pending`}
-            Icon={CheckSquare}
-          />
+          <Link to="/documents" className="block rounded-lg border border-slate-200 bg-white p-4 transition-shadow hover:shadow-md">
+            <div className="flex items-center justify-between mb-2">
+              <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Documents verified</span>
+              <FileText className={cn("size-4", stats.documents.needsAttention > 0 ? "text-amber-500" : "text-emerald-500")} />
+            </div>
+            <div className="flex items-baseline gap-2">
+              <span className="text-2xl font-bold text-slate-900">{stats.documents.verified}/{stats.documents.required}</span>
+            </div>
+            <p className="mt-1 text-xs text-slate-500">{stats.documents.needsAttention > 0 ? `${stats.documents.needsAttention} need attention` : 'All checked'}</p>
+          </Link>
+          
+          <Link to="/approvals" className="block rounded-lg border border-slate-200 bg-white p-4 transition-shadow hover:shadow-md">
+            <div className="flex items-center justify-between mb-2">
+              <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Approvals completed</span>
+              <CheckSquare className="size-4 text-blue-500" />
+            </div>
+            <div className="flex items-baseline gap-2">
+              <span className="text-2xl font-bold text-slate-900">
+                {approvals.filter(a => a.application?.status === 'approved').length}/{approvals.length}
+              </span>
+            </div>
+            <p className="mt-1 text-xs text-slate-500">
+              {approvals.filter(a => a.application?.renewal?.renewalStatus === 'expiring_soon').length} expiring soon
+            </p>
+          </Link>
         </div>
       )}
 
@@ -206,8 +222,27 @@ export function DashboardPage() {
         {/* Right column — Documents + Approvals */}
         <div className="space-y-6">
           <DocumentStatusWidget />
-          {!isLoading && approvals.length > 0 && (
-            <ApprovalProgress approvals={approvals} />
+          {!isApprovalsLoading && approvals.length > 0 && (
+            <div className="rounded-lg border border-slate-200 bg-white shadow-sm overflow-hidden">
+              <div className="border-b border-slate-100 px-5 py-4 flex items-center justify-between">
+                <h2 className="text-sm font-semibold text-slate-900">Required Approvals</h2>
+                <Link to="/approvals" className="text-xs font-medium text-blue-600 hover:text-blue-800 hover:underline underline-offset-2">View all</Link>
+              </div>
+              <ul className="divide-y divide-slate-100">
+                {approvals.map(approval => {
+                   const status = approval.application?.status || 'not_started';
+                   return (
+                     <li key={approval.catalog.id} className="p-4">
+                        <p className="text-sm font-medium text-slate-900">{approval.catalog.name}</p>
+                        <div className="flex justify-between items-center mt-2">
+                          <p className="text-xs text-slate-500">{approval.catalog.department}</p>
+                          <span className="text-xs font-medium capitalize text-blue-600">{status.replace('_', ' ')}</span>
+                        </div>
+                     </li>
+                   )
+                })}
+              </ul>
+            </div>
           )}
         </div>
       </div>

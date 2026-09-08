@@ -246,22 +246,27 @@ The business dashboard serves as the central workspace for the authenticated use
 
 ---
 
-## 11. Government Operations Module (Task 4)
+## 11. Government Operations & Approval Modules
 
-The Government Operations Module serves as the internal administrative counterpart to the Business Dashboard. It is designed for department officers, administrators, and supervisors to process applications deterministically.
+### Module 4: Government Operations Module
+Provides government officials with a highly structured workflow to manage inbound applications, enforce SLA deadlines, and escalate high-risk or delayed submissions.
 
-### Core Objectives
-1. **Deterministic Processing**: Use rule-based logic (SLA deadlines, quantitative risk scoring) to prioritize applications, avoiding non-deterministic AI models.
-2. **Unified Data View**: Integrate seamlessly with the same application and document data used by the business side.
-3. **Role-Based Access Control**: Strictly separate business user accounts from government accounts.
-4. **Efficiency & Transparency**: Provide robust filtering, audit trails, and escalation paths to ensure accountability.
+#### Features
+- **Deterministic SLA & Risk Tracking:** Applications automatically flag as "At Risk" or "Overdue" based on strict date calculations. Risk scores are computed deterministically from application attributes (e.g., industry type, capital investment).
+- **Operations Dashboard:** Real-time visibility into department-wide performance, bottleneck identification, and workload distribution.
+- **Application Processing:** "Single pane of glass" view for reviewing documents, verifying information, and advancing application status (e.g., Raise Query, Approve, Reject).
+- **Escalation Management:** Dedicated workflow for identifying and re-assigning blocked or severely delayed applications.
+- **Audit Logs:** Immutable, chronological records of all status changes, logins, and administrative actions for total accountability.
 
-### Modules & Interfaces
-- **Operations Dashboard**: High-level KPIs, Department Compliance tracking, and a priority queue of At-Risk applications.
-- **Application Management**: Filterable data grid supporting multi-dimensional queries (Risk Level, Status, Department).
-- **Application Detail View**: Dual-pane interface displaying applicant data alongside officer actions (Approve, Reject, Raise Query).
-- **Escalation Management**: System to flag and review applications that have breached critical SLA thresholds.
-- **System Audit Logs**: Immutable chronological record of all officer actions across the platform.
+### Module 5: Approval Module
+Provides a central compliance and lifecycle workspace for businesses to understand and manage all their industrial approvals.
+
+#### Features
+- **Approval Intelligence:** Maps business characteristics to required regulatory approvals (e.g., Factory License, Fire NOC, CTO/CTE).
+- **Readiness Tracking:** Deep integration with the Document Module to calculate "Ready to Apply" status by cross-referencing required documents with verified uploads.
+- **Lifecycle Management:** Visual timeline tracking an approval from Requirements → Documents → Application Submitted → Under Review → Approved.
+- **Renewal System:** Deterministic expiry tracking that surfaces "Expiring Soon" alerts and facilitates streamlined renewal applications.
+- **Government Sync:** Two-way sync with the Government Operations Module (e.g., when an officer raises a query, the Approval Module highlights the Action Required).
 
 ### UX/UI Philosophy
 - Uses the same enterprise-grade design system as the business portal but tailored for high-volume data processing.

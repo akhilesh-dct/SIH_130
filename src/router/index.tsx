@@ -42,6 +42,8 @@ import { GovernmentMyWork } from '@/pages/GovernmentMyWork';
 import { DepartmentPerformance } from '@/pages/DepartmentPerformance';
 import { Escalations } from '@/pages/Escalations';
 import { AuditLogs } from '@/pages/AuditLogs';
+import { ApprovalsPage } from '@/pages/ApprovalsPage';
+import { ApprovalDetailsPage } from '@/pages/ApprovalDetailsPage';
 
 // ---------------------------------------------------------------------------
 // Protected Route Guards
@@ -175,14 +177,14 @@ const router = createBrowserRouter([
         element: <DocumentsPage />,
       },
       // Future pages — rendered inside AppLayout with nav
+      // Task 6 — Approvals
       {
         path: '/approvals',
-        element: (
-          <PlaceholderPage
-            title="Approvals"
-            description="Manage your industrial approval requirements."
-          />
-        ),
+        element: <ApprovalsPage />,
+      },
+      {
+        path: '/approvals/:id',
+        element: <ApprovalDetailsPage />,
       },
       {
         path: '/compliance',
