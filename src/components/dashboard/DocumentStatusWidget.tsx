@@ -5,13 +5,20 @@
  * Connected to the document verification module (Task 2) — clicking navigates to /documents.
  */
 
+import { useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { CheckCircle2, AlertCircle, Circle, ArrowRight } from 'lucide-react';
-import { MOCK_DOCUMENTS } from '@/data/documents';
+import { useDocumentStore } from '@/store/documentStore';
 import { cn } from '@/lib/utils';
 
 export function DocumentStatusWidget() {
-  const docs = MOCK_DOCUMENTS.filter((d) => d.isRequired);
+  const { documents, fetchDocuments, isLoading } = useDocumentStore();
+
+  useEffect(() => {
+    fetchDocuments();
+  }, [fetchDocuments]);
+
+  const docs = documents.filter((d) => d.isRequired);
   const verified = docs.filter((d) => d.status === 'verified').length;
   const attention = docs.filter((d) => d.status === 'needs_attention').length;
   const total = docs.length;
@@ -57,9 +64,17 @@ export function DocumentStatusWidget() {
       </div>
 
       {/* Document list */}
-      <ul className="px-5 pb-5 pt-3 space-y-2" aria-label="Required document statuses">
-        {docs.map((doc) => (
-          <li key={doc.id} className="flex items-center gap-2.5">
+      <div className="px-5 pb-5 pt-3">
+        {isLoading ? (
+          <div className="space-y-3">
+            {[1, 2, 3].map(i => (
+              <div key={i} className="h-4 bg-slate-100 rounded animate-pulse" />
+            ))}
+          </div>
+        ) : (
+          <ul className="space-y-2" aria-label="Required document statuses">
+            {docs.map((doc) => (
+              <li key={doc.id} className="flex items-center gap-2.5">
             {doc.status === 'verified' ? (
               <CheckCircle2 className="size-4 shrink-0 text-green-600" aria-label="Verified" />
             ) : doc.status === 'needs_attention' || doc.status === 'rejected' ? (
@@ -87,6 +102,8 @@ export function DocumentStatusWidget() {
           </li>
         ))}
       </ul>
+      )}
+      </div>
 
       {attention > 0 && (
         <div className="border-t border-slate-100 px-5 py-3">

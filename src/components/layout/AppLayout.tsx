@@ -265,7 +265,6 @@ function NotificationBell() {
 // ---------------------------------------------------------------------------
 
 function SidebarContent({ onNavClick }: { onNavClick?: () => void }) {
-  const { user } = useAuthStore();
   const navigate = useNavigate();
   const { logout } = useAuthStore();
 
@@ -321,17 +320,6 @@ function SidebarContent({ onNavClick }: { onNavClick?: () => void }) {
 
       {/* User + logout */}
       <div className="border-t border-slate-200 px-3 py-3">
-        {user && (
-          <div className="mb-2 flex items-center gap-2.5 px-3 py-2 rounded-md">
-            <div className="flex size-7 shrink-0 items-center justify-center rounded-full bg-slate-200">
-              <User className="size-3.5 text-slate-500" aria-hidden="true" />
-            </div>
-            <div className="flex-1 min-w-0">
-              <p className="text-xs font-semibold text-slate-800 truncate">{user.name}</p>
-              <p className="text-xs text-slate-400 truncate">{user.organizationName}</p>
-            </div>
-          </div>
-        )}
         <button
           onClick={handleLogout}
           className={cn(
@@ -359,63 +347,56 @@ export function AppLayout({
   pageDescription,
   actions,
 }: AppLayoutProps) {
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
+  const { user } = useAuthStore();
 
   // Close drawer on route change
   const location = useLocation();
   useEffect(() => {
-    setMobileMenuOpen(false);
+    setMenuOpen(false);
   }, [location.pathname]);
 
   return (
     <div className="min-h-screen bg-slate-50 flex">
-      {/* ── Desktop Sidebar ── */}
-      <aside
-        className="hidden lg:flex flex-col w-[220px] shrink-0 border-r border-slate-200 bg-white sticky top-0 h-screen overflow-hidden"
-        aria-label="Application sidebar"
-      >
-        <SidebarContent />
-      </aside>
-
-      {/* ── Mobile Drawer Overlay ── */}
-      {mobileMenuOpen && (
+      {/* ── Drawer Overlay ── */}
+      {menuOpen && (
         <div
-          className="fixed inset-0 z-40 bg-slate-900/40 lg:hidden"
-          onClick={() => setMobileMenuOpen(false)}
+          className="fixed inset-0 z-40 bg-slate-900/40"
+          onClick={() => setMenuOpen(false)}
           aria-hidden="true"
         />
       )}
 
-      {/* ── Mobile Drawer ── */}
+      {/* ── Drawer ── */}
       <div
         className={cn(
-          'fixed inset-y-0 left-0 z-50 w-64 bg-white shadow-xl lg:hidden',
+          'fixed inset-y-0 left-0 z-50 w-64 bg-white shadow-xl',
           'transition-transform duration-200',
-          mobileMenuOpen ? 'translate-x-0' : '-translate-x-full'
+          menuOpen ? 'translate-x-0' : '-translate-x-full'
         )}
-        aria-label="Mobile navigation"
+        aria-label="Navigation"
         role="dialog"
         aria-modal="true"
       >
         <button
-          onClick={() => setMobileMenuOpen(false)}
+          onClick={() => setMenuOpen(false)}
           className="absolute right-3 top-3 flex size-8 items-center justify-center rounded-md text-slate-400 hover:text-slate-600"
           aria-label="Close navigation"
         >
           <X className="size-4" aria-hidden="true" />
         </button>
-        <SidebarContent onNavClick={() => setMobileMenuOpen(false)} />
+        <SidebarContent onNavClick={() => setMenuOpen(false)} />
       </div>
 
       {/* ── Main area (top bar + content) ── */}
       <div className="flex flex-col flex-1 min-w-0">
         {/* Top bar */}
         <header className="sticky top-0 z-30 flex h-14 items-center border-b border-slate-200 bg-white px-4 sm:px-6 gap-3">
-          {/* Mobile hamburger */}
+          {/* Hamburger */}
           <button
             type="button"
-            onClick={() => setMobileMenuOpen(true)}
-            className="lg:hidden flex size-9 items-center justify-center rounded-md text-slate-500 hover:bg-slate-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
+            onClick={() => setMenuOpen(true)}
+            className="flex size-9 items-center justify-center rounded-md text-slate-500 hover:bg-slate-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
             aria-label="Open navigation menu"
           >
             <Menu className="size-5" aria-hidden="true" />
@@ -451,11 +432,22 @@ export function AppLayout({
           </div>
 
           {/* Right: notifications + user */}
-          <div className="flex items-center gap-1.5 shrink-0">
+          <div className="flex items-center gap-4 shrink-0">
             <NotificationBell />
-            {/* User avatar — mobile only (sidebar handles desktop) */}
-            <div className="lg:hidden flex size-9 items-center justify-center rounded-md text-slate-500">
-              <User className="size-4" aria-hidden="true" />
+            
+            {/* User Profile */}
+            <div className="flex items-center gap-2.5 pl-4 border-l border-slate-200">
+              <div className="flex flex-col items-end hidden sm:flex">
+                <span className="text-xs font-semibold text-slate-800 leading-tight">
+                  {user?.name || 'User'}
+                </span>
+                <span className="text-[10px] text-slate-500 leading-tight">
+                  {user?.organizationName || 'Organization'}
+                </span>
+              </div>
+              <div className="flex size-8 shrink-0 items-center justify-center rounded-full bg-slate-100 border border-slate-200 text-slate-600">
+                <User className="size-4" aria-hidden="true" />
+              </div>
             </div>
           </div>
         </header>

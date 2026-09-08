@@ -15,12 +15,16 @@ import type {
   Document,
   DocumentUploadResponse,
   VerificationSummary,
+  DocumentVersion,
+  DocumentHistory
 } from '@/types/document.types';
-import { MOCK_DOCUMENTS } from '@/data/documents';
+import { MOCK_DOCUMENTS, MOCK_DOCUMENT_VERSIONS, MOCK_DOCUMENT_HISTORY } from '@/data/documents';
 import { delay } from '@/lib/utils';
 
 // In-memory mutable state for the mock (simulates database)
 let mockDocuments: Document[] = MOCK_DOCUMENTS.map((d) => ({ ...d }));
+let mockVersions: DocumentVersion[] = MOCK_DOCUMENT_VERSIONS.map((v) => ({ ...v })) as unknown as DocumentVersion[];
+let mockHistory: DocumentHistory[] = MOCK_DOCUMENT_HISTORY.map((h) => ({ ...h })) as unknown as DocumentHistory[];
 
 // ---------------------------------------------------------------------------
 // Interface
@@ -28,7 +32,10 @@ let mockDocuments: Document[] = MOCK_DOCUMENTS.map((d) => ({ ...d }));
 
 export interface IDocumentService {
   getDocuments(): Promise<Document[]>;
+  getDocumentsByApplication(applicationId: string): Promise<Document[]>;
   getDocument(id: string): Promise<Document | null>;
+  getDocumentVersions(id: string): Promise<DocumentVersion[]>;
+  getDocumentHistory(id: string): Promise<DocumentHistory[]>;
   uploadFile(
     documentId: string,
     file: File,
@@ -48,9 +55,24 @@ class DocumentService implements IDocumentService {
     return mockDocuments.map((d) => ({ ...d }));
   }
 
+  async getDocumentsByApplication(applicationId: string): Promise<Document[]> {
+    await delay(300);
+    return mockDocuments.filter((d) => d.applicationId === applicationId).map((d) => ({ ...d }));
+  }
+
   async getDocument(id: string): Promise<Document | null> {
     await delay(200);
     return mockDocuments.find((d) => d.id === id) ?? null;
+  }
+
+  async getDocumentVersions(id: string): Promise<DocumentVersion[]> {
+    await delay(200);
+    return mockVersions.filter((v) => v.documentId === id);
+  }
+
+  async getDocumentHistory(id: string): Promise<DocumentHistory[]> {
+    await delay(200);
+    return mockHistory.filter((h) => h.documentId === id);
   }
 
   async uploadFile(
@@ -74,11 +96,38 @@ class DocumentService implements IDocumentService {
     };
 
     // Update in-memory state
-    mockDocuments = mockDocuments.map((d) =>
-      d.id === documentId
-        ? { ...d, status: 'uploaded', uploadedFile }
-        : d
-    );
+    mockDocuments = mockDocuments.map((d) => {
+      if (d.id === documentId) {
+        const newVersion = (d.version || 0) + 1;
+        
+        // Add to history
+        mockHistory.unshift({
+          id: `hist_${Date.now()}`,
+          documentId,
+          action: 'UPLOAD',
+          performedBy: 'usr_01',
+          timestamp: new Date().toISOString(),
+        });
+        
+        // Add to versions if it had a previous file
+        if (d.uploadedFile) {
+           mockVersions.unshift({
+             id: `ver_${Date.now()}`,
+             documentId,
+             version: d.version || 1,
+             fileName: d.uploadedFile.fileName,
+             fileSizeBytes: d.uploadedFile.fileSizeBytes,
+             fileType: d.uploadedFile.fileType,
+             uploadedAt: d.uploadedFile.uploadedAt,
+             uploadedBy: d.uploadedFile.uploadedBy,
+             status: 'expired'
+           });
+        }
+
+        return { ...d, status: 'uploaded', version: newVersion, updatedAt: new Date().toISOString(), uploadedFile };
+      }
+      return d;
+    });
 
     return { uploadedFile, message: 'File uploaded successfully.' };
   }

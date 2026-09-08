@@ -16,6 +16,8 @@ import { AppLayout } from '@/components/layout/AppLayout';
 import { ApplicationTimeline } from '@/components/dashboard/ApplicationTimeline';
 import { ActionRequiredCard } from '@/components/dashboard/ActionRequiredCard';
 import { VerificationStatus as StatusBadge } from '@/components/documents/VerificationStatus';
+import { DocumentTable } from '@/components/documents/DocumentTable';
+import { useDocumentStore } from '@/store/documentStore';
 import { cn } from '@/lib/utils';
 
 // Map application status to document status for badge reuse
@@ -74,11 +76,15 @@ export function ApplicationDetailPage() {
   const { applicationId } = useParams<{ applicationId: string }>();
   const { selectedApplication, actions, fetchApplication, clearSelectedApplication } =
     useDashboardStore();
+  const { documents, isLoading: docsLoading, fetchDocuments } = useDocumentStore();
 
   useEffect(() => {
-    if (applicationId) fetchApplication(applicationId);
+    if (applicationId) {
+      fetchApplication(applicationId);
+      fetchDocuments(applicationId);
+    }
     return () => clearSelectedApplication();
-  }, [applicationId, fetchApplication, clearSelectedApplication]);
+  }, [applicationId, fetchApplication, fetchDocuments, clearSelectedApplication]);
 
   const app = selectedApplication;
   const relatedActions = actions.filter((a) => a.applicationId === applicationId);
@@ -210,6 +216,26 @@ export function ApplicationDetailPage() {
               </div>
             </section>
           )}
+
+          {/* Required Documents Table */}
+          <section aria-label="Required documents for this application" className="mt-6">
+            <div className="flex items-center justify-between mb-3">
+              <h2 className="text-sm font-semibold text-slate-700">Required Documents</h2>
+              <Link to="/documents" className="text-xs font-medium text-blue-600 hover:text-blue-700">
+                View all in workspace &rarr;
+              </Link>
+            </div>
+            <DocumentTable
+              documents={documents}
+              selectedId={null}
+              isLoading={docsLoading}
+              onSelect={(id) => {
+                // Navigate to documents workspace with this doc selected
+                window.location.href = `/documents?docId=${id}`;
+              }}
+              onDownload={() => {}}
+            />
+          </section>
 
           {/* Approved message */}
           {app.status === 'approved' && (

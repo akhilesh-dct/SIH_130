@@ -40,6 +40,7 @@ export function DocumentUpload({
   onClearError,
 }: DocumentUploadProps) {
   const [isDragOver, setIsDragOver] = useState(false);
+  const [validationError, setValidationError] = useState<string | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
   const acceptTypes = doc.acceptedFormats
@@ -54,14 +55,25 @@ export function DocumentUpload({
   const handleFile = useCallback(
     (file: File | undefined) => {
       if (!file) return;
+      setValidationError(null);
       // Basic client-side validation
       if (file.size > doc.maxSizeMb * 1024 * 1024) {
-        // Signal oversized file through store error
+        setValidationError(`File is too large. Maximum allowed size is ${doc.maxSizeMb} MB.`);
         return;
       }
+      
+      const fileExt = file.name.split('.').pop()?.toUpperCase() || '';
+      const isAcceptedFormat = doc.acceptedFormats.includes(fileExt) || 
+        doc.acceptedFormats.some(fmt => file.type.includes(fmt.toLowerCase()));
+        
+      if (!isAcceptedFormat) {
+        setValidationError(`Invalid file type. Accepted formats are: ${doc.acceptedFormats.join(', ')}`);
+        return;
+      }
+      
       onUpload(doc.id, file);
     },
-    [doc.id, doc.maxSizeMb, onUpload]
+    [doc]
   );
 
   const handleDrop = (e: React.DragEvent) => {
@@ -175,6 +187,12 @@ export function DocumentUpload({
             />
           </div>
         )}
+        {validationError && (
+          <div className="mt-3 text-xs text-red-600 flex items-start gap-1">
+            <XCircle className="size-3.5 shrink-0 mt-0.5" />
+            <span>{validationError}</span>
+          </div>
+        )}
       </div>
     );
   }
@@ -251,8 +269,15 @@ export function DocumentUpload({
         tabIndex={-1}
       />
 
-      {doc.maxSizeMb > 5 && (
-        <p className="mt-2 flex items-center gap-1.5 text-xs text-slate-400">
+      {validationError && (
+        <div className="mt-2 text-xs text-red-600 flex items-start justify-center gap-1">
+          <XCircle className="size-3.5 shrink-0 mt-0.5" />
+          <span>{validationError}</span>
+        </div>
+      )}
+
+      {doc.maxSizeMb > 5 && !validationError && (
+        <p className="mt-2 flex items-center justify-center gap-1.5 text-xs text-slate-400">
           <AlertTriangle className="size-3 shrink-0" aria-hidden="true" />
           Large files may take longer to verify.
         </p>

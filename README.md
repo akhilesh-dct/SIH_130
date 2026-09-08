@@ -210,12 +210,13 @@ This design system extends unchanged into Task 2 and Task 3.
 
 ### Workspace Layout
 
-**Desktop (≥ 1024px):** Three-column layout
-- Left (280px): Scrollable document list grouped by Required/Optional
-- Center (flex): Mock document preview panel
-- Right (340px): Document details, upload zone, verification result
+**Desktop (≥ 1024px):** Dashboard-style layout
+- Top: Verification Summary
+- Main: Filterable Data Table showing all documents (DocumentTable)
+- Right Panel (Slide-over): Document details, version history, audit timeline, and upload zone
+- Preview: Toggleable preview area within the details panel
 
-**Mobile (< 1024px):** Tab navigation between Documents / Preview / Details
+**Mobile (< 1024px):** Stacked responsive layout focusing on the list, opening details upon selection.
 
 ### Document Verification States
 

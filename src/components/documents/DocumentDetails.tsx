@@ -12,7 +12,10 @@ import { VerificationStatus } from './VerificationStatus';
 import { VerificationChecklist } from './VerificationChecklist';
 import { VerificationIssue } from './VerificationIssue';
 import { DocumentUpload } from './DocumentUpload';
+import { DocumentVersionHistory } from './DocumentVersionHistory';
+import { DocumentTimeline } from './DocumentTimeline';
 import { cn } from '@/lib/utils';
+import type { DocumentVersion, DocumentHistory } from '@/types/document.types';
 
 const CATEGORY_LABELS: Record<string, string> = {
   corporate: 'Corporate',
@@ -30,6 +33,9 @@ interface DocumentDetailsProps {
   onUpload: (documentId: string, file: File) => void;
   onRemove: (documentId: string) => void;
   onClearError: () => void;
+  versions?: DocumentVersion[];
+  history?: DocumentHistory[];
+  onDownloadVersion?: (version: DocumentVersion) => void;
 }
 
 export function DocumentDetails({
@@ -38,6 +44,9 @@ export function DocumentDetails({
   onUpload,
   onRemove,
   onClearError,
+  versions = [],
+  history = [],
+  onDownloadVersion,
 }: DocumentDetailsProps) {
   const hasVerification = !!doc.verificationResult;
   const hasIssues =
@@ -135,6 +144,22 @@ export function DocumentDetails({
             notified when the review is complete.
           </p>
         </div>
+      )}
+
+      {/* Version History */}
+      {versions.length > 0 && (
+        <>
+          <div className="h-px bg-slate-100" aria-hidden="true" />
+          <DocumentVersionHistory versions={versions} onDownload={onDownloadVersion} />
+        </>
+      )}
+
+      {/* Document Timeline */}
+      {history.length > 0 && (
+        <>
+          <div className="h-px bg-slate-100" aria-hidden="true" />
+          <DocumentTimeline history={history} />
+        </>
       )}
 
       {/* Continue action */}

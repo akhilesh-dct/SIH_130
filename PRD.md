@@ -145,8 +145,10 @@ Loading state (button spinner, form disabled, ~900ms)
 ### Feature Objective
 
 Provide a professional document management workspace where business users can:
-- View all required and optional compliance documents for their application
+- View all required and optional compliance documents for their application in a searchable, filterable data table
 - Upload documents in accepted formats
+- Maintain complete version history for document replacements
+- View an audit trail / timeline of all actions taken on a document
 - Track verification status for each document
 - Review verification check results and identified issues
 - Take corrective action on documents requiring attention
@@ -166,12 +168,14 @@ Provide a professional document management workspace where business users can:
 ### User Journey
 
 ```
-Login → Dashboard → Documents
-  → Select document from list
+Login → Dashboard / Applications → View Required Documents 
+  → Navigate to Document Workspace
+  → Filter / Search for Document
+  → Select document from Data Table
   → Upload file (drag/drop or browse)
-  → File uploaded → queued for verification
+  → File uploaded → queued for verification (new version created)
   → Verification result: Verified / Needs Attention / Rejected
-  → If Needs Attention: review issue → replace document
+  → If Needs Attention: review issue → replace document (increments version)
   → All required documents verified → Continue to Application
 ```
 
@@ -196,20 +200,19 @@ Login → Dashboard → Documents
 
 ### Acceptance Criteria — Task 2
 
-- [x] Document list shows all required and optional documents grouped
-- [x] Each document shows name, category, status badge, upload date
-- [x] Clicking a document selects it and shows preview + details
+- [x] Document workspace uses a professional Dashboard-style layout with a Data Table
+- [x] Data table supports searching and filtering by status
+- [x] Documents show version history and download links for older versions
+- [x] Audit trail records actions like uploads, verification requests, and status changes
+- [x] Clicking a document opens a side panel/drawer for details and mock preview
 - [x] Upload zone supports click-to-browse and drag-and-drop
 - [x] Upload progress shown with animated bar
 - [x] Verified documents show green status and checklist of passed checks
 - [x] Needs Attention documents show issue card with description and suggested action
 - [x] Replace file option available for needs-attention/rejected documents
 - [x] Verification summary bar shows aggregate counts
-- [x] Responsive: mobile tab navigation, tablet two-panel, desktop three-panel
 - [x] Continue to Application button links to application workflow
 - [x] No console errors in production build
-- [x] All existing routes (login, dashboard) continue to work
-
 
 ### Verification Summary
 

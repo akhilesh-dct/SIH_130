@@ -6,8 +6,9 @@
  * Shows a realistic-looking placeholder that represents the document type.
  */
 
-import { FileText, Lock } from 'lucide-react';
+import { FileText, Lock, Download, RefreshCw, Trash2 } from 'lucide-react';
 import type { Document } from '@/types/document.types';
+import { VerificationStatus } from './VerificationStatus';
 import { cn } from '@/lib/utils';
 
 function formatDate(iso: string): string {
@@ -96,9 +97,12 @@ const CATEGORY_MOCK: Record<
 
 interface DocumentPreviewProps {
   document: Document;
+  onDownload?: (doc: Document) => void;
+  onReplace?: (docId: string) => void;
+  onDelete?: (docId: string) => void;
 }
 
-export function DocumentPreview({ document: doc }: DocumentPreviewProps) {
+export function DocumentPreview({ document: doc, onDownload, onReplace, onDelete }: DocumentPreviewProps) {
   if (doc.status === 'not_uploaded') {
     return (
       <div className="flex flex-col items-center justify-center h-full min-h-[280px] gap-4 text-center p-8">
@@ -176,14 +180,55 @@ export function DocumentPreview({ document: doc }: DocumentPreviewProps) {
           </div>
         </div>
 
-        {/* File info bar */}
+        {/* File info bar and Actions */}
         {doc.uploadedFile && (
-          <div className="mt-3 flex items-center gap-2 text-xs text-slate-400">
-            <FileText className="size-3.5" aria-hidden="true" />
-            <span className="truncate">{doc.uploadedFile.fileName}</span>
-            <span className="shrink-0">
-              {(doc.uploadedFile.fileSizeBytes / (1024 * 1024)).toFixed(1)} MB
-            </span>
+          <div className="mt-4 border-t border-slate-200 pt-4 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-slate-50 p-4 rounded-lg">
+            <div className="flex flex-col gap-1">
+              <div className="flex items-center gap-2 text-sm font-medium text-slate-800">
+                <FileText className="size-4 text-slate-500" aria-hidden="true" />
+                <span className="truncate max-w-[200px]">{doc.uploadedFile.fileName}</span>
+              </div>
+              <div className="flex items-center gap-3 text-xs text-slate-500">
+                <span>{(doc.uploadedFile.fileSizeBytes / (1024 * 1024)).toFixed(2)} MB</span>
+                <span>•</span>
+                <span className="uppercase">{doc.uploadedFile.fileType.split('/')[1] || 'PDF'}</span>
+                <span>•</span>
+                <span>{formatDate(doc.uploadedFile.uploadedAt)}</span>
+              </div>
+              <div className="mt-1">
+                <VerificationStatus status={doc.status} />
+              </div>
+            </div>
+            
+            <div className="flex items-center gap-2">
+              {onDownload && (
+                <button
+                  onClick={() => onDownload(doc)}
+                  className="flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium text-slate-700 bg-white border border-slate-300 rounded hover:bg-slate-50 transition-colors"
+                >
+                  <Download className="size-4" />
+                  Download
+                </button>
+              )}
+              {onReplace && (
+                <button
+                  onClick={() => onReplace(doc.id)}
+                  className="flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium text-slate-700 bg-white border border-slate-300 rounded hover:bg-slate-50 transition-colors"
+                >
+                  <RefreshCw className="size-4" />
+                  Replace
+                </button>
+              )}
+              {onDelete && doc.status !== 'verified' && (
+                <button
+                  onClick={() => onDelete(doc.id)}
+                  className="flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium text-red-600 bg-white border border-red-200 rounded hover:bg-red-50 transition-colors"
+                >
+                  <Trash2 className="size-4" />
+                  Delete
+                </button>
+              )}
+            </div>
           </div>
         )}
       </div>

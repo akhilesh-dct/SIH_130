@@ -101,6 +101,7 @@ const attentionIssue: VerificationIssue = {
 export const MOCK_DOCUMENTS: Document[] = [
   {
     id: 'doc_01',
+    applicationId: 'app_01',
     name: 'Certificate of Incorporation',
     category: 'corporate',
     description:
@@ -109,6 +110,8 @@ export const MOCK_DOCUMENTS: Document[] = [
     acceptedFormats: ['PDF'],
     maxSizeMb: 5,
     status: 'verified',
+    version: 1,
+    updatedAt: '2026-09-04T10:45:00Z',
     uploadedFile: {
       id: 'upl_01',
       fileName: 'certificate_of_incorporation.pdf',
@@ -127,6 +130,7 @@ export const MOCK_DOCUMENTS: Document[] = [
   },
   {
     id: 'doc_02',
+    applicationId: 'app_01',
     name: 'PAN Card (Organization)',
     category: 'tax',
     description:
@@ -135,6 +139,8 @@ export const MOCK_DOCUMENTS: Document[] = [
     acceptedFormats: ['PDF', 'JPG', 'PNG'],
     maxSizeMb: 2,
     status: 'verified',
+    version: 1,
+    updatedAt: '2026-09-04T10:47:00Z',
     uploadedFile: {
       id: 'upl_02',
       fileName: 'organization_pan.pdf',
@@ -153,6 +159,7 @@ export const MOCK_DOCUMENTS: Document[] = [
   },
   {
     id: 'doc_03',
+    applicationId: 'app_01',
     name: 'GST Registration Certificate',
     category: 'tax',
     description:
@@ -161,6 +168,8 @@ export const MOCK_DOCUMENTS: Document[] = [
     acceptedFormats: ['PDF'],
     maxSizeMb: 5,
     status: 'needs_attention',
+    version: 1,
+    updatedAt: '2026-09-04T11:00:00Z',
     uploadedFile: {
       id: 'upl_03',
       fileName: 'gst_registration_certificate.pdf',
@@ -179,6 +188,7 @@ export const MOCK_DOCUMENTS: Document[] = [
   },
   {
     id: 'doc_04',
+    applicationId: 'app_01',
     name: 'Factory License',
     category: 'factory',
     description:
@@ -187,6 +197,8 @@ export const MOCK_DOCUMENTS: Document[] = [
     acceptedFormats: ['PDF'],
     maxSizeMb: 10,
     status: 'verified',
+    version: 2,
+    updatedAt: '2026-09-05T09:35:00Z',
     uploadedFile: {
       id: 'upl_04',
       fileName: 'factory_license_2026.pdf',
@@ -205,6 +217,7 @@ export const MOCK_DOCUMENTS: Document[] = [
   },
   {
     id: 'doc_05',
+    applicationId: 'app_01',
     name: 'Environmental Consent Order',
     category: 'environment',
     description:
@@ -213,6 +226,8 @@ export const MOCK_DOCUMENTS: Document[] = [
     acceptedFormats: ['PDF'],
     maxSizeMb: 10,
     status: 'uploaded',
+    version: 1,
+    updatedAt: '2026-09-06T14:00:00Z',
     uploadedFile: {
       id: 'upl_05',
       fileName: 'environmental_consent_order.pdf',
@@ -224,6 +239,7 @@ export const MOCK_DOCUMENTS: Document[] = [
   },
   {
     id: 'doc_06',
+    applicationId: 'app_01',
     name: 'Project Report / DPR',
     category: 'financial',
     description:
@@ -232,9 +248,11 @@ export const MOCK_DOCUMENTS: Document[] = [
     acceptedFormats: ['PDF'],
     maxSizeMb: 20,
     status: 'not_uploaded',
+    version: 0,
   },
   {
     id: 'doc_07',
+    applicationId: 'app_01',
     name: 'Address Proof (Registered Office)',
     category: 'identity',
     description:
@@ -243,5 +261,76 @@ export const MOCK_DOCUMENTS: Document[] = [
     acceptedFormats: ['PDF', 'JPG', 'PNG'],
     maxSizeMb: 5,
     status: 'not_uploaded',
+    version: 0,
   },
+];
+
+export const MOCK_DOCUMENT_VERSIONS = [
+  {
+    id: 'ver_01',
+    documentId: 'doc_04',
+    version: 1,
+    fileName: 'factory_license_old.pdf',
+    fileSizeBytes: 1_500_000,
+    fileType: 'application/pdf',
+    uploadedAt: '2025-08-10T09:00:00Z',
+    uploadedBy: 'usr_01',
+    status: 'expired',
+  },
+  {
+    id: 'ver_02',
+    documentId: 'doc_04',
+    version: 2,
+    fileName: 'factory_license_2026.pdf',
+    fileSizeBytes: 2_097_152,
+    fileType: 'application/pdf',
+    uploadedAt: '2026-09-05T09:10:00Z',
+    uploadedBy: 'usr_01',
+    status: 'verified',
+  }
+];
+
+export const MOCK_DOCUMENT_HISTORY = [
+  {
+    id: 'hist_01',
+    documentId: 'doc_04',
+    action: 'UPLOAD',
+    performedBy: 'usr_01',
+    timestamp: '2025-08-10T09:00:00Z',
+  },
+  {
+    id: 'hist_02',
+    documentId: 'doc_04',
+    action: 'VERIFICATION_REQUESTED',
+    performedBy: 'usr_01',
+    timestamp: '2025-08-10T09:05:00Z',
+  },
+  {
+    id: 'hist_03',
+    documentId: 'doc_04',
+    action: 'VERIFIED',
+    performedBy: 'sys_auto',
+    timestamp: '2025-08-10T10:00:00Z',
+  },
+  {
+    id: 'hist_04',
+    documentId: 'doc_04',
+    action: 'REPLACE',
+    performedBy: 'usr_01',
+    timestamp: '2026-09-05T09:10:00Z',
+  },
+  {
+    id: 'hist_05',
+    documentId: 'doc_04',
+    action: 'VERIFICATION_REQUESTED',
+    performedBy: 'usr_01',
+    timestamp: '2026-09-05T09:15:00Z',
+  },
+  {
+    id: 'hist_06',
+    documentId: 'doc_04',
+    action: 'VERIFIED',
+    performedBy: 'sys_auto',
+    timestamp: '2026-09-05T09:35:00Z',
+  }
 ];

@@ -22,10 +22,12 @@ export type DocumentCategory =
 export type DocumentStatus =
   | 'not_uploaded'
   | 'uploaded'
+  | 'validating'
   | 'verifying'
   | 'verified'
   | 'needs_attention'
-  | 'rejected';
+  | 'rejected'
+  | 'expired';
 
 export type VerificationCheckStatus = 'passed' | 'failed' | 'warning' | 'pending';
 
@@ -35,6 +37,7 @@ export type VerificationCheckStatus = 'passed' | 'failed' | 'warning' | 'pending
 
 export interface Document {
   id: string;
+  applicationId?: string;           // Link to the parent application
   name: string;
   category: DocumentCategory;
   description: string;
@@ -42,8 +45,10 @@ export interface Document {
   acceptedFormats: string[];        // e.g. ['PDF', 'JPG', 'PNG']
   maxSizeMb: number;
   status: DocumentStatus;
+  version?: number;                 // Current document version
   uploadedFile?: UploadedFile;
   verificationResult?: VerificationResult;
+  updatedAt?: string;               // ISO 8601
 }
 
 export interface UploadedFile {
@@ -78,6 +83,27 @@ export interface VerificationIssue {
   title: string;
   description: string;
   suggestedAction?: string;
+}
+
+export interface DocumentVersion {
+  id: string;
+  documentId: string;
+  version: number;
+  fileName: string;
+  fileSizeBytes: number;
+  fileType: string;
+  uploadedAt: string;
+  uploadedBy: string;
+  status: DocumentStatus;
+}
+
+export interface DocumentHistory {
+  id: string;
+  documentId: string;
+  action: 'UPLOAD' | 'VIEW' | 'DOWNLOAD' | 'REPLACE' | 'DELETE' | 'VERIFICATION_REQUESTED' | 'VERIFIED' | 'REJECTED';
+  performedBy: string;
+  timestamp: string;
+  metadata?: Record<string, string>;
 }
 
 // ---------------------------------------------------------------------------

@@ -1,33 +1,23 @@
 /**
  * DocumentsPage — Document Verification Workspace
  *
- * Three-panel layout:
- *   Left    — DocumentList (scrollable)
- *   Center  — DocumentPreview
- *   Right   — DocumentDetails (upload + verification result)
- *
- * On tablet (md): two panels (list + details, preview hidden)
- * On mobile: tab navigation between list, preview, and details
+ * Dashboard layout:
+ *   Top     — Verification Summary
+ *   Left    — DocumentFilters & DocumentTable
+ *   Right   — DocumentDetails (slide-over or side panel on desktop)
  */
 
-import { useEffect, useState } from 'react';
-import type { ElementType } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import { useDocumentStore } from '@/store/documentStore';
 import { AppLayout } from '@/components/layout/AppLayout';
-import { DocumentList } from '@/components/documents/DocumentList';
-import { DocumentPreview } from '@/components/documents/DocumentPreview';
+import { DocumentTable } from '@/components/documents/DocumentTable';
+import { DocumentFilters } from '@/components/documents/DocumentFilters';
 import { DocumentDetails } from '@/components/documents/DocumentDetails';
+import { DocumentPreview } from '@/components/documents/DocumentPreview';
 import { VerificationSummary } from '@/components/documents/VerificationSummary';
 import { cn } from '@/lib/utils';
-import { List, Eye, FileCheck } from 'lucide-react';
-
-type MobileTab = 'list' | 'preview' | 'details';
-
-const MOBILE_TABS: { id: MobileTab; label: string; Icon: ElementType }[] = [
-  { id: 'list', label: 'Documents', Icon: List },
-  { id: 'preview', label: 'Preview', Icon: Eye },
-  { id: 'details', label: 'Details', Icon: FileCheck },
-];
+import { X } from 'lucide-react';
+import type { DocumentStatus } from '@/types/document.types';
 
 export function DocumentsPage() {
   const {
@@ -37,6 +27,8 @@ export function DocumentsPage() {
     summary,
     isLoading,
     uploadState,
+    versions,
+    history,
     fetchDocuments,
     selectDocument,
     uploadFile,
@@ -44,25 +36,34 @@ export function DocumentsPage() {
     clearUploadState,
   } = useDocumentStore();
 
-  const [mobileTab, setMobileTab] = useState<MobileTab>('list');
+  const [searchQuery, setSearchQuery] = useState('');
+  const [statusFilter, setStatusFilter] = useState<DocumentStatus | 'all'>('all');
+  const [showPreview, setShowPreview] = useState(false);
 
   // Load documents on mount
   useEffect(() => {
     fetchDocuments();
   }, [fetchDocuments]);
 
-  // Auto-select first document on desktop
-  useEffect(() => {
-    if (!isLoading && documents.length > 0 && !selectedDocumentId) {
-      selectDocument(documents[0].id);
-    }
-  }, [isLoading, documents, selectedDocumentId, selectDocument]);
-
   const handleSelect = (id: string) => {
     selectDocument(id);
-    // On mobile, switch to details tab after selecting
-    setMobileTab('details');
+    setShowPreview(false); // Reset to details view when selecting a new doc
   };
+
+  const handleDownload = (doc: any) => {
+    // Mock download action
+    console.log('Downloading document:', doc.name || doc.fileName);
+    alert(`Downloading ${doc.name || doc.fileName}...`);
+  };
+
+  const filteredDocuments = useMemo(() => {
+    return documents.filter((doc) => {
+      const matchesSearch = doc.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
+                            doc.category.toLowerCase().includes(searchQuery.toLowerCase());
+      const matchesStatus = statusFilter === 'all' || doc.status === statusFilter;
+      return matchesSearch && matchesStatus;
+    });
+  }, [documents, searchQuery, statusFilter]);
 
   return (
     <AppLayout
@@ -71,10 +72,10 @@ export function DocumentsPage() {
         { label: 'Document Verification' },
       ]}
       pageTitle="Document Verification"
-      pageDescription="Upload, manage, and track verification of your required compliance documents."
+      pageDescription="Manage documents required for your applications and approvals."
     >
       {/* Summary bar */}
-      <div className="mb-5">
+      <div className="mb-6">
         {summary ? (
           <VerificationSummary summary={summary} />
         ) : (
@@ -82,108 +83,76 @@ export function DocumentsPage() {
         )}
       </div>
 
-      {/* ── Mobile tab bar ── */}
-      <div className="xl:hidden flex border-b border-slate-200 bg-white rounded-t-lg overflow-hidden mb-0">
-        {MOBILE_TABS.map(({ id, label, Icon }) => (
-          <button
-            key={id}
-            type="button"
-            onClick={() => setMobileTab(id)}
-            aria-current={mobileTab === id ? 'true' : undefined}
-            className={cn(
-              'flex-1 flex items-center justify-center gap-2 py-3 text-xs font-medium',
-              'border-b-2 transition-colors duration-150',
-              'focus:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-blue-500',
-              mobileTab === id
-                ? 'border-blue-600 text-blue-700 bg-blue-50'
-                : 'border-transparent text-slate-500 hover:text-slate-700 hover:bg-slate-50'
-            )}
-          >
-            <Icon className="size-3.5" aria-hidden="true" />
-            {label}
-          </button>
-        ))}
-      </div>
-
-      {/* ── Three-panel workspace ── */}
-      <div
-        className="flex border border-slate-200 rounded-b-lg xl:rounded-lg bg-white overflow-hidden shadow-sm"
-        style={{ minHeight: '600px' }}
-      >
-        {/* ── Left: Document List ── */}
-        <div
-          className={cn(
-            'xl:w-[280px] xl:border-r xl:border-slate-200 xl:flex xl:flex-col overflow-y-auto',
-            // Mobile visibility
-            mobileTab === 'list' ? 'flex flex-col w-full' : 'hidden xl:flex xl:flex-col'
-          )}
-          aria-label="Document list panel"
-        >
-          <DocumentList
-            documents={documents}
+      <div className="flex flex-col xl:flex-row gap-6 items-start relative">
+        {/* Main Content: Filters + Table */}
+        <div className={cn(
+          "flex-1 w-full flex flex-col space-y-4",
+          selectedDocument ? "xl:w-[calc(100%-420px)]" : "w-full"
+        )}>
+          <DocumentFilters
+            searchQuery={searchQuery}
+            onSearchChange={setSearchQuery}
+            statusFilter={statusFilter}
+            onStatusFilterChange={setStatusFilter}
+          />
+          <DocumentTable
+            documents={filteredDocuments}
             selectedId={selectedDocumentId}
             isLoading={isLoading}
             onSelect={handleSelect}
+            onDownload={handleDownload}
           />
         </div>
 
-        {/* ── Center: Preview ── */}
-        <div
-          className={cn(
-            'xl:flex-1 xl:border-r xl:border-slate-200 xl:flex xl:flex-col overflow-hidden',
-            // Mobile visibility
-            mobileTab === 'preview' ? 'flex flex-col flex-1' : 'hidden xl:flex xl:flex-col xl:flex-1'
-          )}
-          aria-label="Document preview panel"
-        >
-          {selectedDocument ? (
-            <DocumentPreview document={selectedDocument} />
-          ) : (
-            <div className="flex flex-col items-center justify-center h-full min-h-[280px] text-center p-8">
-              <p className="text-sm text-slate-400">
-                Select a document from the list to preview it here.
-              </p>
+        {/* Side Panel: Details or Preview */}
+        {selectedDocument && (
+          <div className="w-full xl:w-[400px] shrink-0 rounded-lg border border-slate-200 bg-white shadow-sm overflow-hidden flex flex-col xl:sticky xl:top-6" style={{ maxHeight: 'calc(100vh - 120px)' }}>
+            <div className="flex items-center justify-between border-b border-slate-200 bg-slate-50 px-4 py-3">
+              <h3 className="text-sm font-semibold text-slate-800">
+                {showPreview ? 'Document Preview' : 'Document Details'}
+              </h3>
+              <div className="flex items-center gap-2">
+                {selectedDocument.uploadedFile && (
+                  <button
+                    onClick={() => setShowPreview(!showPreview)}
+                    className="text-xs font-medium text-blue-600 hover:text-blue-700"
+                  >
+                    {showPreview ? 'Show Details' : 'Show Preview'}
+                  </button>
+                )}
+                <button
+                  onClick={() => selectDocument(null)}
+                  className="p-1 rounded-md text-slate-400 hover:bg-slate-200 hover:text-slate-600 transition-colors"
+                  aria-label="Close panel"
+                >
+                  <X className="size-4" />
+                </button>
+              </div>
             </div>
-          )}
-        </div>
-
-        {/* ── Right: Details ── */}
-        <div
-          className={cn(
-            'xl:w-[340px] xl:flex xl:flex-col overflow-y-auto',
-            // Mobile visibility
-            mobileTab === 'details' ? 'flex flex-col w-full' : 'hidden xl:flex xl:flex-col'
-          )}
-          aria-label="Document details panel"
-        >
-          {selectedDocument ? (
-            <div className="p-5">
-              <DocumentDetails
-                document={selectedDocument}
-                uploadState={uploadState}
-                onUpload={uploadFile}
-                onRemove={removeFile}
-                onClearError={clearUploadState}
-              />
+            
+            <div className="flex-1 overflow-y-auto p-4 xl:p-5">
+              {showPreview ? (
+                <DocumentPreview 
+                  document={selectedDocument} 
+                  onDownload={handleDownload}
+                  onReplace={() => setShowPreview(false)}
+                />
+              ) : (
+                <DocumentDetails
+                  document={selectedDocument}
+                  uploadState={uploadState}
+                  onUpload={uploadFile}
+                  onRemove={removeFile}
+                  onClearError={clearUploadState}
+                  versions={versions}
+                  history={history}
+                  onDownloadVersion={handleDownload}
+                />
+              )}
             </div>
-          ) : (
-            <div className="flex flex-col items-center justify-center h-full min-h-[280px] text-center p-8">
-              <p className="text-sm text-slate-400">
-                Select a document to view details and verification status.
-              </p>
-            </div>
-          )}
-        </div>
+          </div>
+        )}
       </div>
-
-      {/* Instructions footnote */}
-      <p className="mt-3 text-xs text-slate-400 flex items-center gap-1">
-        <span
-          className="inline-block size-1.5 rounded-full bg-blue-400"
-          aria-hidden="true"
-        />
-        Required documents are marked with a star. All required documents must be verified before submitting your application.
-      </p>
     </AppLayout>
   );
 }

@@ -22,6 +22,11 @@ const STATUS_MAP: Record<DocumentStatus, StatusConfig> = {
     Icon: HelpCircle,
     className: 'bg-slate-100 text-slate-500',
   },
+  validating: {
+    label: 'Validating',
+    Icon: Clock,
+    className: 'bg-blue-50 text-blue-600',
+  },
   uploaded: {
     label: 'Uploaded',
     Icon: Upload,
@@ -46,6 +51,11 @@ const STATUS_MAP: Record<DocumentStatus, StatusConfig> = {
     label: 'Rejected',
     Icon: XCircle,
     className: 'bg-red-50 text-red-700',
+  },
+  expired: {
+    label: 'Expired',
+    Icon: AlertCircle,
+    className: 'bg-slate-100 text-slate-500',
   },
 };
 

@@ -7,7 +7,7 @@
  */
 
 import { create } from 'zustand';
-import type { Document, VerificationSummary, UploadState } from '@/types/document.types';
+import type { Document, VerificationSummary, UploadState, DocumentVersion, DocumentHistory } from '@/types/document.types';
 import { documentService } from '@/services/document.service';
 
 interface DocumentStore {
@@ -19,12 +19,18 @@ interface DocumentStore {
   uploadState: UploadState;
   error: string | null;
 
+  // Document specific details
+  versions: DocumentVersion[];
+  history: DocumentHistory[];
+  isDetailsLoading: boolean;
+
   // Computed
   selectedDocument: Document | null;
 
   // Actions
-  fetchDocuments: () => Promise<void>;
+  fetchDocuments: (applicationId?: string) => Promise<void>;
   selectDocument: (id: string | null) => void;
+  fetchDocumentDetails: (id: string) => Promise<void>;
   uploadFile: (documentId: string, file: File) => Promise<void>;
   removeFile: (documentId: string) => Promise<void>;
   clearUploadState: () => void;
@@ -39,17 +45,25 @@ export const useDocumentStore = create<DocumentStore>()((set, get) => ({
   uploadState: { phase: 'idle' },
   error: null,
 
+  versions: [],
+  history: [],
+  isDetailsLoading: false,
+
   // Computed: resolve selected document from list
   get selectedDocument() {
     const { documents, selectedDocumentId } = get();
     return documents.find((d) => d.id === selectedDocumentId) ?? null;
   },
 
-  fetchDocuments: async () => {
+  fetchDocuments: async (applicationId) => {
     set({ isLoading: true, error: null });
     try {
+      const docsPromise = applicationId 
+        ? documentService.getDocumentsByApplication(applicationId) 
+        : documentService.getDocuments();
+
       const [documents, summary] = await Promise.all([
-        documentService.getDocuments(),
+        docsPromise,
         documentService.getSummary(),
       ]);
       set({ documents, summary, isLoading: false });
@@ -59,7 +73,23 @@ export const useDocumentStore = create<DocumentStore>()((set, get) => ({
   },
 
   selectDocument: (id) => {
-    set({ selectedDocumentId: id, uploadState: { phase: 'idle' } });
+    set({ selectedDocumentId: id, uploadState: { phase: 'idle' }, versions: [], history: [] });
+    if (id) {
+      get().fetchDocumentDetails(id);
+    }
+  },
+
+  fetchDocumentDetails: async (id) => {
+    set({ isDetailsLoading: true });
+    try {
+      const [versions, history] = await Promise.all([
+        documentService.getDocumentVersions(id),
+        documentService.getDocumentHistory(id)
+      ]);
+      set({ versions, history, isDetailsLoading: false });
+    } catch {
+      set({ isDetailsLoading: false });
+    }
   },
 
   uploadFile: async (documentId, file) => {
@@ -69,12 +99,13 @@ export const useDocumentStore = create<DocumentStore>()((set, get) => ({
         set({ uploadState: { phase: 'uploading', file, progressPercent: pct } });
       });
       set({ uploadState: { phase: 'success', uploadedFile: response.uploadedFile } });
-      // Refresh documents to reflect new state
+      // Refresh documents and details to reflect new state
       const [documents, summary] = await Promise.all([
-        documentService.getDocuments(),
+        documentService.getDocuments(), // or by application if we stored it, but we can assume global refresh for now
         documentService.getSummary(),
       ]);
       set({ documents, summary });
+      get().fetchDocumentDetails(documentId);
     } catch {
       set({ uploadState: { phase: 'error', message: 'Upload failed. Please try again.' } });
     }

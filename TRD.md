@@ -270,14 +270,17 @@ The Document Verification module is a client-side workspace for document managem
 ### Component Architecture
 
 ```
-pages/DocumentsPage.tsx              ← Three-panel workspace orchestrator
+pages/DocumentsPage.tsx              ← Dashboard-style orchestrator
   └── components/layout/AppLayout.tsx  ← Shared nav shell (used by all auth pages)
   └── components/documents/
-      ├── DocumentList.tsx            ← Scrollable list of document slots
-      ├── DocumentCard.tsx            ← Individual row with status + file info
-      ├── DocumentPreview.tsx         ← Center panel — mock document representation
-      ├── DocumentDetails.tsx         ← Right panel — upload + verification result
+      ├── DocumentFilters.tsx         ← Status and text search filters
+      ├── DocumentTable.tsx           ← Main data table for documents
+      ├── DocumentRow.tsx             ← Individual row in table
+      ├── DocumentPreview.tsx         ← Mock document representation
+      ├── DocumentDetails.tsx         ← Side panel for upload and details
       ├── DocumentUpload.tsx          ← Upload state machine component
+      ├── DocumentVersionHistory.tsx  ← Shows past versions
+      ├── DocumentTimeline.tsx        ← Audit trail feed
       ├── UploadProgress.tsx          ← Animated progress bar during upload
       ├── VerificationStatus.tsx      ← Status badge (shared)
       ├── VerificationChecklist.tsx   ← List of check results
@@ -300,6 +303,8 @@ src/
 ```typescript
 Document           // Core document entity
 UploadedFile       // File metadata after upload
+DocumentVersion    // Historical versions
+DocumentHistory    // Audit trail events
 VerificationResult // Result of a verification run
 VerificationCheck  // Individual check item
 VerificationIssue  // Identified issue with suggested action
@@ -352,8 +357,8 @@ This drives all visual states in `DocumentUpload.tsx` without any conditional bo
 
 | Breakpoint | Layout |
 |-----------|--------|
-| < 1024px (xl) | Mobile: tab navigation between List / Preview / Details panels |
-| ≥ 1024px (xl) | Desktop: full three-panel side-by-side layout |
+| < 1024px (xl) | Stacked layout: Document Table followed by Details below if selected |
+| ≥ 1024px (xl) | Dashboard layout: Data Table + Side panel for Details (sticky) |
 
 ### Mock Data Reset
 
