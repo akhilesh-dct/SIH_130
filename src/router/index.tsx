@@ -35,16 +35,26 @@ import { DocumentsPage } from '@/pages/DocumentsPage';
 import { ApplicationsPage } from '@/pages/ApplicationsPage';
 import { ApplicationDetailPage } from '@/pages/ApplicationDetailPage';
 import { AppLayout } from '@/components/layout/AppLayout';
+import { GovernmentDashboard } from '@/pages/GovernmentDashboard';
+import { GovernmentApplications } from '@/pages/GovernmentApplications';
+import { GovernmentApplicationDetails } from '@/pages/GovernmentApplicationDetails';
+import { GovernmentMyWork } from '@/pages/GovernmentMyWork';
 
 // ---------------------------------------------------------------------------
-// Protected Route Guard
+// Protected Route Guards
 // ---------------------------------------------------------------------------
 
-function ProtectedRoute() {
-  const status = useAuthStore((s) => s.status);
-  if (status !== 'authenticated') {
-    return <Navigate to="/login" replace />;
-  }
+function BusinessRoute() {
+  const { status, user } = useAuthStore();
+  if (status !== 'authenticated') return <Navigate to="/login" replace />;
+  if (user?.role !== 'business_user') return <Navigate to="/government" replace />;
+  return <Outlet />;
+}
+
+function GovernmentRoute() {
+  const { status, user } = useAuthStore();
+  if (status !== 'authenticated') return <Navigate to="/login" replace />;
+  if (user?.role === 'business_user') return <Navigate to="/dashboard" replace />;
   return <Outlet />;
 }
 
@@ -123,9 +133,9 @@ const router = createBrowserRouter([
     element: <PublicPlaceholder title="Password Reset" />,
   },
 
-  // Protected routes
+  // Business routes
   {
-    element: <ProtectedRoute />,
+    element: <BusinessRoute />,
     children: [
       // Task 3 — Dashboard
       {
@@ -197,6 +207,41 @@ const router = createBrowserRouter([
             description="Manage your account and organization details."
           />
         ),
+      },
+    ],
+  },
+
+  // Government routes
+  {
+    element: <GovernmentRoute />,
+    children: [
+      {
+        path: '/government',
+        element: <GovernmentDashboard />,
+      },
+      {
+        path: '/government/applications',
+        element: <GovernmentApplications />,
+      },
+      {
+        path: '/government/applications/:id',
+        element: <GovernmentApplicationDetails />,
+      },
+      {
+        path: '/government/my-work',
+        element: <GovernmentMyWork />,
+      },
+      {
+        path: '/government/departments',
+        element: <PublicPlaceholder title="Department Analytics" />,
+      },
+      {
+        path: '/government/escalations',
+        element: <PublicPlaceholder title="Escalations" />,
+      },
+      {
+        path: '/government/audit-logs',
+        element: <PublicPlaceholder title="Audit Logs" />,
       },
     ],
   },

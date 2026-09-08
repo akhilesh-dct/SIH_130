@@ -73,6 +73,19 @@ const SECONDARY_NAV: NavItem[] = [
   { href: '/profile', label: 'Profile', Icon: User },
 ];
 
+const GOVERNMENT_NAV: NavItem[] = [
+  { href: '/government', label: 'Ops Dashboard', Icon: LayoutDashboard, exact: true },
+  { href: '/government/applications', label: 'All Applications', Icon: FolderOpen },
+  { href: '/government/my-work', label: 'My Work', Icon: CheckSquare },
+  { href: '/government/departments', label: 'Dept. Analytics', Icon: Building2 },
+  { href: '/government/escalations', label: 'Escalations', Icon: LifeBuoy },
+];
+
+const GOVERNMENT_SECONDARY_NAV: NavItem[] = [
+  { href: '/government/audit-logs', label: 'Audit Logs', Icon: FileText },
+  { href: '/profile', label: 'Profile', Icon: User },
+];
+
 // ---------------------------------------------------------------------------
 // NavLink component
 // ---------------------------------------------------------------------------
@@ -266,13 +279,17 @@ function NotificationBell() {
 
 function SidebarContent({ onNavClick }: { onNavClick?: () => void }) {
   const navigate = useNavigate();
-  const { logout } = useAuthStore();
+  const { user, logout } = useAuthStore();
 
   const handleLogout = async () => {
     await authService.logout();
     logout();
     navigate('/login', { replace: true });
   };
+
+  const isGov = user && ['officer', 'department_admin', 'super_admin'].includes(user.role);
+  const primaryNav = isGov ? GOVERNMENT_NAV : PRIMARY_NAV;
+  const secondaryNav = isGov ? GOVERNMENT_SECONDARY_NAV : SECONDARY_NAV;
 
   return (
     <div className="flex flex-col h-full">
@@ -306,14 +323,14 @@ function SidebarContent({ onNavClick }: { onNavClick?: () => void }) {
         <p className="px-3 pb-2 text-xs font-semibold text-slate-400 uppercase tracking-wider">
           Workspace
         </p>
-        {PRIMARY_NAV.map((item) => (
+        {primaryNav.map((item) => (
           <NavLink key={item.href} item={item} onClick={onNavClick} />
         ))}
 
         <p className="px-3 pb-2 pt-4 text-xs font-semibold text-slate-400 uppercase tracking-wider">
           Account
         </p>
-        {SECONDARY_NAV.map((item) => (
+        {secondaryNav.map((item) => (
           <NavLink key={item.href} item={item} onClick={onNavClick} />
         ))}
       </nav>

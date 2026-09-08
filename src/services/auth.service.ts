@@ -43,11 +43,37 @@ const MOCK_USERS: Record<string, { password: string; user: User }> = {
       id: 'usr_02',
       email: 'officer@gov.in',
       name: 'Priya Sharma',
-      role: 'government_officer',
+      role: 'officer',
       organizationName: 'Ministry of Commerce & Industry',
       organizationId: 'org_gov_001',
       isVerified: true,
       lastLoginAt: new Date(Date.now() - 3600000).toISOString(),
+    },
+  },
+  'admin@gov.in': {
+    password: 'govpass123',
+    user: {
+      id: 'usr_03',
+      email: 'admin@gov.in',
+      name: 'Anil Desai',
+      role: 'department_admin',
+      organizationName: 'Ministry of Commerce & Industry',
+      organizationId: 'org_gov_001',
+      isVerified: true,
+      lastLoginAt: new Date(Date.now() - 7200000).toISOString(),
+    },
+  },
+  'superadmin@gov.in': {
+    password: 'govpass123',
+    user: {
+      id: 'usr_04',
+      email: 'superadmin@gov.in',
+      name: 'Central Admin',
+      role: 'super_admin',
+      organizationName: 'Government of India',
+      organizationId: 'org_gov_central',
+      isVerified: true,
+      lastLoginAt: new Date(Date.now() - 86400000).toISOString(),
     },
   },
 };
@@ -81,10 +107,15 @@ class AuthService implements IAuthService {
       throw error;
     }
 
-    if (record.user.role !== credentials.role) {
+    const isGovRole = ['officer', 'department_admin', 'super_admin'].includes(record.user.role);
+    const isValidRole = credentials.role === 'business_user' 
+      ? record.user.role === 'business_user'
+      : (credentials.role === 'officer' && isGovRole);
+
+    if (!isValidRole) {
       const error: AuthError = {
         code: 'INVALID_CREDENTIALS',
-        message: `This account is registered as a ${record.user.role === 'business_user' ? 'Business User' : 'Government Officer'}. Please select the correct role.`,
+        message: `This account is registered as a ${record.user.role === 'business_user' ? 'Business User' : 'Government User'}. Please select the correct workspace.`,
       };
       throw error;
     }

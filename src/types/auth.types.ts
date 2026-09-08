@@ -1,7 +1,7 @@
 // Auth domain types for SIH 130 Industrial Platform
 // Interface-stable: designed to match FastAPI backend contract
 
-export type UserRole = 'business_user' | 'government_officer';
+export type UserRole = 'business_user' | 'officer' | 'department_admin' | 'super_admin';
 
 export interface User {
   id: string;

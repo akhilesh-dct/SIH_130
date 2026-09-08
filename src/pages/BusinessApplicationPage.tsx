@@ -11,42 +11,7 @@ import {
   ClipboardCheck,
 } from 'lucide-react';
 
-type BusinessApplication = {
-  id: string;
-  businessName: string;
-  businessType: string;
-  industrySector: string;
-  businessActivity: string;
-  businessDescription: string;
 
-  promoterName: string;
-  email: string;
-  phone: string;
-
-  state: string;
-  district: string;
-  city: string;
-  address: string;
-  pin: string;
-
-  totalInvestment: string;
-  landInvestment: string;
-  machineryInvestment: string;
-  workingCapital: string;
-  expectedEmployment: string;
-  skilledWorkers: string;
-  unskilledWorkers: string;
-
-  landArea: string;
-  builtUpArea: string;
-  powerRequirement: string;
-  waterRequirement: string;
-  pollutionCategory: string;
-  expectedStartDate: string;
-
-  status: string;
-  createdAt: string;
-};
 
 const STORAGE_KEY = 'sih_business_applications';
 

@@ -42,7 +42,7 @@ interface RoleSelectorProps {
 function RoleSelector({ value, onChange, disabled }: RoleSelectorProps) {
   const roles: { id: UserRole; label: string; Icon: ElementType }[] = [
     { id: 'business_user', label: 'Business User', Icon: Building2 },
-    { id: 'government_officer', label: 'Government Officer', Icon: Landmark },
+    { id: 'officer', label: 'Government', Icon: Landmark },
   ];
 
   return (
