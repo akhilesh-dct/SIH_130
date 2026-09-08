@@ -243,3 +243,27 @@ The business dashboard serves as the central workspace for the authenticated use
 - **Restraint & Utility**: Focus on fast information retrieval, avoiding decorative clutter.
 - **Severity-based Coloring**: Use standard semantic colors for urgency (red = urgent, amber = warning, green = success).
 - **Smooth Navigation**: Zero page reloads across the dashboard, documents, and application details.
+
+---
+
+## 11. Government Operations Module (Task 4)
+
+The Government Operations Module serves as the internal administrative counterpart to the Business Dashboard. It is designed for department officers, administrators, and supervisors to process applications deterministically.
+
+### Core Objectives
+1. **Deterministic Processing**: Use rule-based logic (SLA deadlines, quantitative risk scoring) to prioritize applications, avoiding non-deterministic AI models.
+2. **Unified Data View**: Integrate seamlessly with the same application and document data used by the business side.
+3. **Role-Based Access Control**: Strictly separate business user accounts from government accounts.
+4. **Efficiency & Transparency**: Provide robust filtering, audit trails, and escalation paths to ensure accountability.
+
+### Modules & Interfaces
+- **Operations Dashboard**: High-level KPIs, Department Compliance tracking, and a priority queue of At-Risk applications.
+- **Application Management**: Filterable data grid supporting multi-dimensional queries (Risk Level, Status, Department).
+- **Application Detail View**: Dual-pane interface displaying applicant data alongside officer actions (Approve, Reject, Raise Query).
+- **Escalation Management**: System to flag and review applications that have breached critical SLA thresholds.
+- **System Audit Logs**: Immutable chronological record of all officer actions across the platform.
+
+### UX/UI Philosophy
+- Uses the same enterprise-grade design system as the business portal but tailored for high-volume data processing.
+- Leverages badges, progress bars, and severity coloring to instantly communicate risk and compliance status.
+- Integrates action dialogues (Assign Officer, Escalate) directly into the application context to minimize context switching.

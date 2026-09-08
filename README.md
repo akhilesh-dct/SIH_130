@@ -16,6 +16,7 @@ This is a multi-module application being built incrementally:
 | Task 1 | Authentication (Login Page) | ✅ Implemented |
 | Task 2 | Document Verification | ✅ Implemented |
 | Task 3 | Business Dashboard | ✅ Implemented |
+| Task 4 | Government Operations Module | ✅ Implemented |
 
 ---
 
@@ -258,6 +259,25 @@ To reset upload state: refresh the page (in-memory mock only).
 1. Open [`src/services/dashboard.service.ts`](src/services/dashboard.service.ts)
 2. Replace the `DashboardService` class body with real `fetch` calls.
 3. Replace the mock endpoints with `GET /api/v1/dashboard/stats`, `GET /api/v1/applications`, etc.
+
+---
+
+## Government Operations Module (Task 4)
+
+### Overview
+A parallel workspace specifically designed for department officers, maintaining the same underlying design language but tailored for high-volume application processing and deterministic compliance checks.
+
+### Features
+- **Deterministic SLA & Risk Tracking**: Applications automatically calculate SLA statuses and risk scores based on hard deadlines and configured risk factors.
+- **Operations Dashboard**: Government-centric KPIs, At-Risk prioritization, and Department Compliance analytics.
+- **Application Grid**: Highly filterable list of all submissions.
+- **Officer Processing View**: Unified interface to review business documents, assign officers, and take administrative actions (Approve, Reject, Raise Query).
+- **Escalation & Audit**: `Escalations.tsx` and `AuditLogs.tsx` pages tracking severe breaches and immutable system events.
+
+### Connecting Government Service to FastAPI
+1. Open [`src/services/government.service.ts`](src/services/government.service.ts)
+2. Replace the `GovernmentService` mock implementation with API calls.
+3. Map endpoints such as `GET /api/v1/government/applications`, `POST /api/v1/government/applications/:id/escalate`, etc.
 
 ---
 

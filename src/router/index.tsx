@@ -39,6 +39,9 @@ import { GovernmentDashboard } from '@/pages/GovernmentDashboard';
 import { GovernmentApplications } from '@/pages/GovernmentApplications';
 import { GovernmentApplicationDetails } from '@/pages/GovernmentApplicationDetails';
 import { GovernmentMyWork } from '@/pages/GovernmentMyWork';
+import { DepartmentPerformance } from '@/pages/DepartmentPerformance';
+import { Escalations } from '@/pages/Escalations';
+import { AuditLogs } from '@/pages/AuditLogs';
 
 // ---------------------------------------------------------------------------
 // Protected Route Guards
@@ -233,15 +236,15 @@ const router = createBrowserRouter([
       },
       {
         path: '/government/departments',
-        element: <PublicPlaceholder title="Department Analytics" />,
+        element: <DepartmentPerformance />,
       },
       {
         path: '/government/escalations',
-        element: <PublicPlaceholder title="Escalations" />,
+        element: <Escalations />,
       },
       {
         path: '/government/audit-logs',
-        element: <PublicPlaceholder title="Audit Logs" />,
+        element: <AuditLogs />,
       },
     ],
   },

@@ -401,3 +401,25 @@ Task 3 implemented multiple routes, maintaining SPA integrity:
 - `/applications/:applicationId` (Detail view)
 
 Placeholders are used for unbuilt sections (`/approvals`, `/compliance`) which also render within the `AppLayout`.
+
+---
+
+## 6. Task 4: Government Operations Module
+
+### Architecture Overview
+The Government Module runs in parallel with the Business Dashboard within the same React SPA. It leverages a custom `GovernmentRoute` guard to enforce RBAC based on `user.role`. Business Users are routed away from Government paths and vice versa.
+
+### Data Layer (`government.service.ts`)
+The service layer drives all decision-making without relying on AI:
+- **Deterministic SLA Calculation**: Compares the application's `slaDeadline` against the current date via `date-fns` logic, resulting in strict statuses (`ON_TRACK`, `AT_RISK`, `CRITICAL`, `OVERDUE`).
+- **Risk Assessment System**: Generates a numeric `riskScore` (0-100) and discrete `riskLevel` based on arrays of explicitly defined `RiskFactor` objects (e.g., SLA breaches, active queries, pending inspections).
+
+### Core Components
+- `GovernmentDashboard.tsx`: KPI aggregation and priority lists.
+- `GovernmentApplications.tsx`: Data grid with multi-dimensional filtering (Status, Risk Level, Department).
+- `GovernmentApplicationDetails.tsx`: Split-pane detail view combining business document previews with an internal Action Panel.
+- `DepartmentPerformance.tsx`: Analytics view computing SLA compliance across departments.
+- `Escalations.tsx` & `AuditLogs.tsx`: Compliance tracking and security logging.
+
+### Component Design (Action Dialogs)
+Instead of fragmented pages, administrative actions are designed as context-aware, inline modal dialogs (`AssignOfficerDialog.tsx`, `EscalationDialog.tsx`) directly accessible from the application details view. This reduces context switching for government officers.

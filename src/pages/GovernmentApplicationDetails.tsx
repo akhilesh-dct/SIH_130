@@ -2,12 +2,14 @@ import { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import {
   ArrowLeft, Calendar, Building2, Hash, Clock, AlertTriangle, CheckCircle2,
-  AlertCircle, ShieldAlert, CheckSquare, FileText, Send
+  AlertCircle, ShieldAlert, CheckSquare, FileText, Send, UserPlus, AlertOctagon
 } from 'lucide-react';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { ApplicationTimeline } from '@/components/dashboard/ApplicationTimeline';
 import { DocumentTable } from '@/components/documents/DocumentTable';
 import { VerificationStatus as StatusBadge } from '@/components/documents/VerificationStatus';
+import { AssignOfficerDialog } from '@/components/government/AssignOfficerDialog';
+import { EscalationDialog } from '@/components/government/EscalationDialog';
 import { useDocumentStore } from '@/store/documentStore';
 import { governmentService } from '@/services/government.service';
 import type { GovernmentApplication, GovernmentApplicationStatus } from '@/types/government.types';
@@ -58,19 +60,24 @@ export function GovernmentApplicationDetails() {
   const [queryMessage, setQueryMessage] = useState('');
   const [isUpdating, setIsUpdating] = useState(false);
 
-  useEffect(() => {
-    async function loadData() {
-      if (id) {
-        setLoading(true);
-        try {
-          const data = await governmentService.getApplicationDetails(id);
-          setApp(data);
-          await fetchDocuments(id);
-        } finally {
-          setLoading(false);
-        }
+  // Dialog states
+  const [isAssignOpen, setIsAssignOpen] = useState(false);
+  const [isEscalateOpen, setIsEscalateOpen] = useState(false);
+
+  const loadData = async () => {
+    if (id) {
+      setLoading(true);
+      try {
+        const data = await governmentService.getApplicationDetails(id);
+        setApp(data);
+        await fetchDocuments(id);
+      } finally {
+        setLoading(false);
       }
     }
+  };
+
+  useEffect(() => {
     loadData();
   }, [id, fetchDocuments]);
 
@@ -157,11 +164,28 @@ export function GovernmentApplicationDetails() {
 
             <div className="relative z-10 mt-6 grid grid-cols-2 gap-y-5 gap-x-4">
               <DetailRow icon={Building2} label="Department" value={app.department} />
-              {app.assignedOfficerName ? (
-                <DetailRow icon={CheckSquare} label="Assigned Officer" value={app.assignedOfficerName} />
-              ) : (
-                <DetailRow icon={AlertTriangle} label="Assignment" value="Unassigned" valueClass="text-amber-600" />
-              )}
+              
+              <div className="flex items-start gap-3">
+                <CheckSquare className="mt-0.5 size-4 shrink-0 text-slate-400" aria-hidden="true" />
+                <div>
+                  <p className="text-xs text-slate-400">Assigned Officer</p>
+                  <div className="flex items-center gap-2">
+                    {app.assignedOfficerName ? (
+                      <p className="text-sm font-medium text-slate-800">{app.assignedOfficerName}</p>
+                    ) : (
+                      <p className="text-sm font-medium text-amber-600">Unassigned</p>
+                    )}
+                    <button 
+                      onClick={() => setIsAssignOpen(true)}
+                      className="ml-2 inline-flex items-center gap-1 rounded bg-slate-100 px-2 py-0.5 text-xs font-medium text-slate-600 hover:bg-slate-200"
+                    >
+                      <UserPlus className="size-3" />
+                      {app.assignedOfficerName ? 'Reassign' : 'Assign'}
+                    </button>
+                  </div>
+                </div>
+              </div>
+
               {app.submittedAt && (
                 <DetailRow icon={Calendar} label="Submitted Date" value={new Date(app.submittedAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })} />
               )}
@@ -351,13 +375,37 @@ export function GovernmentApplicationDetails() {
                       Send Query
                     </button>
                   </form>
+                  
+                  <div className="pt-2">
+                    <button
+                      onClick={() => setIsEscalateOpen(true)}
+                      className="flex w-full items-center justify-center gap-2 rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50 hover:text-red-600 transition-colors"
+                    >
+                      <AlertOctagon className="size-4" />
+                      Escalate Application
+                    </button>
+                  </div>
                 </div>
               )}
             </div>
           </div>
         </div>
-
       </div>
+
+      <AssignOfficerDialog 
+        isOpen={isAssignOpen} 
+        onClose={() => setIsAssignOpen(false)} 
+        applicationId={app.id}
+        currentOfficerId={app.assignedOfficerId}
+        onAssigned={loadData}
+      />
+      
+      <EscalationDialog
+        isOpen={isEscalateOpen}
+        onClose={() => setIsEscalateOpen(false)}
+        applicationId={app.id}
+        onEscalated={loadData}
+      />
     </AppLayout>
   );
 }
