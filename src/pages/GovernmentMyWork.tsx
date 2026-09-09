@@ -4,13 +4,17 @@ import { governmentService } from '@/services/government.service';
 import type { GovernmentApplication } from '@/types/government.types';
 import { useAuthStore } from '@/store/authStore';
 import { Link } from 'react-router-dom';
-import { AlertTriangle, Clock } from 'lucide-react';
+import { AlertTriangle, Clock, CheckCircle2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { complianceService } from '@/services/compliance.service';
+import type { ComplianceObligation } from '@/types/compliance.types';
+import { ComplianceStatusBadge } from '@/components/compliance/ComplianceStatusBadge';
 
 
 export function GovernmentMyWork() {
   const { user } = useAuthStore();
   const [applications, setApplications] = useState<GovernmentApplication[]>([]);
+  const [compliances, setCompliances] = useState<ComplianceObligation[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -18,8 +22,12 @@ export function GovernmentMyWork() {
       if (user) {
         setLoading(true);
         try {
-          const data = await governmentService.getMyWork(user.id);
+          const [data, complianceData] = await Promise.all([
+            governmentService.getMyWork(user.id),
+            complianceService.getPendingSubmissions()
+          ]);
           setApplications(data);
+          setCompliances(complianceData);
         } finally {
           setLoading(false);
         }
@@ -29,6 +37,13 @@ export function GovernmentMyWork() {
   }, [user]);
 
   const activeApps = applications.filter(a => !['approved', 'rejected', 'withdrawn'].includes(a.status));
+
+  const handleApproveCompliance = async (id: string) => {
+    if (!user) return;
+    await complianceService.markCompliant('mock-business-123', id, user.name);
+    const updated = await complianceService.getPendingSubmissions();
+    setCompliances(updated);
+  };
 
   return (
     <AppLayout
@@ -130,6 +145,68 @@ export function GovernmentMyWork() {
                         >
                           Process
                         </Link>
+                      </td>
+                    </tr>
+                  ))
+                )}
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        {/* Compliance Submissions Section */}
+        <div className="rounded-xl border border-slate-200 bg-white shadow-sm overflow-hidden">
+          <div className="border-b border-slate-200 px-5 py-4 bg-slate-50 flex justify-between items-center">
+            <h2 className="text-base font-semibold text-slate-900">Pending Compliance Submissions</h2>
+            <span className="text-xs font-medium text-slate-500">{compliances.length} pending</span>
+          </div>
+          <div className="overflow-x-auto">
+            <table className="w-full text-left text-sm text-slate-600">
+              <thead className="bg-slate-50 text-xs uppercase text-slate-500 border-b border-slate-200">
+                <tr>
+                  <th className="px-5 py-4 font-medium">Compliance Details</th>
+                  <th className="px-5 py-4 font-medium">Authority & Category</th>
+                  <th className="px-5 py-4 font-medium">Status</th>
+                  <th className="px-5 py-4 font-medium text-right">Action</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-slate-100">
+                {loading ? (
+                  <tr>
+                    <td colSpan={4} className="px-5 py-12 text-center text-slate-500">
+                      Loading submissions...
+                    </td>
+                  </tr>
+                ) : compliances.length === 0 ? (
+                  <tr>
+                    <td colSpan={4} className="px-5 py-12 text-center text-slate-500">
+                      No pending compliance submissions.
+                    </td>
+                  </tr>
+                ) : (
+                  compliances.map((comp) => (
+                    <tr key={comp.id} className="hover:bg-slate-50 transition-colors">
+                      <td className="px-5 py-4">
+                        <p className="font-semibold text-slate-900 mb-0.5">{comp.name}</p>
+                        <p className="text-xs text-slate-500 mb-1">Due: {new Date(comp.dueDate).toLocaleDateString()}</p>
+                      </td>
+                      <td className="px-5 py-4">
+                        <p className="text-sm text-slate-700">{comp.authorityName}</p>
+                        <p className="text-xs text-slate-500">{comp.category}</p>
+                      </td>
+                      <td className="px-5 py-4">
+                        <ComplianceStatusBadge status={comp.status} />
+                      </td>
+                      <td className="px-5 py-4 text-right">
+                        <div className="flex items-center justify-end gap-2">
+                          <button
+                            onClick={() => handleApproveCompliance(comp.id)}
+                            className="inline-flex items-center justify-center rounded-md bg-green-50 border border-green-200 px-3 py-1.5 text-sm font-semibold text-green-700 hover:bg-green-100 transition-all"
+                          >
+                            <CheckCircle2 className="size-4 mr-1.5" />
+                            Mark Compliant
+                          </button>
+                        </div>
                       </td>
                     </tr>
                   ))

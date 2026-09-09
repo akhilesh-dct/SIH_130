@@ -48,6 +48,10 @@ import { SchemesPage } from '@/pages/SchemesPage';
 import { SchemeDetailPage } from '@/pages/SchemeDetailPage';
 import { SchemeEligibilityPage } from '@/pages/SchemeEligibilityPage';
 import { SavedSchemesPage } from '@/pages/SavedSchemesPage';
+import { CompliancePage } from '@/pages/CompliancePage';
+import { ComplianceDetailsPage } from '@/pages/ComplianceDetailsPage';
+import { ComplianceCalendarPage } from '@/pages/ComplianceCalendarPage';
+import { ComplianceHistoryPage } from '@/pages/ComplianceHistoryPage';
 
 // ---------------------------------------------------------------------------
 // Protected Route Guards
@@ -192,12 +196,19 @@ const router = createBrowserRouter([
       },
       {
         path: '/compliance',
-        element: (
-          <PlaceholderPage
-            title="Compliance"
-            description="Review your statutory compliance obligations."
-          />
-        ),
+        element: <CompliancePage />,
+      },
+      {
+        path: '/compliance/calendar',
+        element: <ComplianceCalendarPage />,
+      },
+      {
+        path: '/compliance/history',
+        element: <ComplianceHistoryPage />,
+      },
+      {
+        path: '/compliance/:id',
+        element: <ComplianceDetailsPage />,
       },
       {
         path: '/schemes',

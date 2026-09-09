@@ -272,3 +272,14 @@ Provides a central compliance and lifecycle workspace for businesses to understa
 - Uses the same enterprise-grade design system as the business portal but tailored for high-volume data processing.
 - Leverages badges, progress bars, and severity coloring to instantly communicate risk and compliance status.
 - Integrates action dialogues (Assign Officer, Escalate) directly into the application context to minimize context switching.
+
+### Module 6: Compliance Management Module
+Provides a comprehensive system for businesses to track, complete, and maintain their regulatory compliance obligations.
+
+#### Features
+- **Compliance Applicability Engine:** A deterministic, rule-based system that matches a business profile to its necessary regulatory compliance obligations (no AI used).
+- **Due Date Engine:** Deterministically calculates upcoming and recurring deadlines based on compliance frequency (e.g., Annual, Monthly).
+- **Risk Assessment System:** Transparently computes a compliance risk score based on approaching deadlines, missing evidence, and past rejections, explicitly listing the risk factors.
+- **Evidence Management:** Tightly integrated with the Document Module, allowing businesses to upload required compliance evidence directly against an obligation.
+- **Government Verification:** Full integration with the Government Operations dashboard, allowing officers to review and mark submitted compliances as verified or rejected.
+- **Compliance History & Calendar:** Chronological timeline of events and calendar views for proactive obligation management.

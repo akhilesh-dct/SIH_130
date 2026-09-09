@@ -441,3 +441,24 @@ The Approval Module provides the "Compliance and Lifecycle Workspace" for the bu
 - `ApprovalCard.tsx`: A reusable card summarizing the approval's status, SLA, and requirements.
 - `DocumentReadiness.tsx`: Calculates readiness and visually displays which required documents are verified, missing, or need attention.
 - `ApprovalTimeline.tsx`: A vertical timeline component tracking the application through its stages.
+
+---
+
+## 8. Task 7: Compliance Management Module
+
+### Architecture Overview
+The Compliance Module extends the platform to manage recurring regulatory obligations. It acts as a bridge between the business profile (which dictates applicability), the document module (which manages evidence), and the government module (which handles verification).
+
+### Data Layer (`compliance.service.ts` & `complianceStore.ts`)
+- **`complianceStore`**: Zustand store managing state for compliance obligations, summary statistics, and history. Uses `fetchObligations`, `submitCompliance`, and `fetchHistory`.
+- **`compliance.service.ts`**: Implements the `ComplianceApplicabilityEngine`, which deterministically creates mock obligations based on predefined rules. Implements risk scoring through explicit factor accumulation rather than opaque AI models. Calculates due dates dynamically via `date-fns`.
+
+### Core Components
+- `CompliancePage.tsx`: The primary dashboard showing aggregate compliance health, a high-priority "Action Center", and a sortable, filterable list of all applicable obligations.
+- `ComplianceDetailsPage.tsx`: Detailed view for an individual obligation. Features an `EvidenceList` integrated with the document mock data structure, and an embedded timeline/history view.
+- `ComplianceCalendarPage.tsx`: A monthly view of obligations, grouped by due date, for long-term planning.
+- `ComplianceHistoryPage.tsx`: A dedicated view for reviewing past, completed, or rejected compliance cycles.
+- `ComplianceRiskIndicator.tsx` & `ComplianceStatusBadge.tsx`: Reusable UI elements for standardized, accessible status communication.
+
+### Government Integration
+- Extended `GovernmentMyWork.tsx` to include a "Pending Compliance Submissions" data table, allowing officers to review submitted compliances and update their status to "COMPLIANT", thus completing the business-to-government loop.

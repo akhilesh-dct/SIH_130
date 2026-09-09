@@ -60,7 +60,7 @@ const PRIMARY_NAV: NavItem[] = [
   { href: '/applications', label: 'Applications', Icon: FolderOpen },
   { href: '/documents', label: 'Documents', Icon: FileText },
   { href: '/approvals', label: 'Approvals', Icon: CheckSquare },
-  { href: '/compliance', label: 'Compliance', Icon: CheckSquare, disabled: true },
+  { href: '/compliance', label: 'Compliance', Icon: CheckSquare },
   {
   href: '/business',
   label: 'Business Details',
