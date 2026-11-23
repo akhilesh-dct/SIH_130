@@ -279,8 +279,4 @@ A parallel workspace specifically designed for department officers, maintaining 
 ### Connecting Government Service to FastAPI
 1. Open [`src/services/government.service.ts`](src/services/government.service.ts)
 2. Replace the `GovernmentService` mock implementation with API calls.
-3. Map endpoints such as `GET /api/v1/government/applications`, `POST /api/v1/government/applications/:id/escalate`, etc.
-
----
-
-*IndustriaConnect — SIH 2026, Problem Statement 130*
+3. Map endpoints such as `GET /api/v1/government/applications`, `POST /api/v1/government/applications/:id/escalate`
