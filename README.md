@@ -1,7 +1,7 @@
 # IndustriaConnect
 
 **Industrial Approvals & Compliance Platform**  
-SIH 2026 — Problem Statement 130
+
 
 ---
 
